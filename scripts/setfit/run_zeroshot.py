@@ -29,7 +29,7 @@ def parse_args():
     parser.add_argument("--model", default="paraphrase-mpnet-base-v2")
     parser.add_argument("--eval_dataset", default="SetFit/emotion")
     parser.add_argument("--candidate_labels", nargs="+")
-    parser.add_argument("--reference_dataset", default="SetFit/emotion")
+    parser.add_argument("--reference_dataset", default=None)
     parser.add_argument("--label_names_column", default="label_text")
     parser.add_argument("--aug_sample_size", type=int, default=8)
     parser.add_argument("--num_iterations", type=int, default=20)
@@ -92,7 +92,7 @@ def main():
 
     metric = DEV_DATASET_TO_METRIC.get(args.eval_dataset, TEST_DATASET_TO_METRIC.get(args.eval_dataset, "accuracy"))
 
-    if args.reference_dataset is None:
+    if args.reference_dataset is None and args.candidate_labels is None:
         args.reference_dataset = args.eval_dataset
 
     train_data = get_templated_dataset(

@@ -59,6 +59,7 @@ def parse_args():
     parser.add_argument("--override_results", default=False, action="store_true")
     parser.add_argument("--keep_body_frozen", default=False, action="store_true")
     parser.add_argument("--add_data_augmentation", default=False)
+    parser.add_argument("--num_splits", type=int, default=10)
 
     args = parser.parse_args()
 
@@ -118,7 +119,7 @@ def main():
                 f"({', '.join(f'label {label} w. {n_samples} samples' for label, n_samples in label_samples)})."
             )
 
-        for split_name, train_data in few_shot_train_splits.items():
+        for split_name, train_data in list(few_shot_train_splits.items())[:args.num_splits]:
             results_path = create_results_path(dataset, split_name, output_path)
             if os.path.exists(results_path) and not args.override_results:
                 print(f"Skipping finished experiment: {results_path}")

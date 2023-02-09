@@ -393,6 +393,26 @@ class SetFitTrainer:
                 show_progress_bar=True,
             )
 
+    def predict(self, dataset: Optional["Dataset"]=None):
+        if dataset is None:
+            x_test = self.eval_dataset["text"]
+        else:
+            x_test = dataset["text"]
+            
+        logger.info("***** Running prediction *****")
+        y_pred = self.model.predict(x_test)
+        return y_pred
+
+    def predict_proba(self, dataset: Optional["Dataset"]=None):
+        if dataset is None:
+            x_test = self.eval_dataset["text"]
+        else:
+            x_test = dataset["text"]
+            
+        logger.info("***** Running probabilities prediction *****")
+        y_pred = self.model.predict_proba(x_test)
+        return y_pred
+
     def evaluate(self):
         """
         Computes the metrics for a given classifier.
