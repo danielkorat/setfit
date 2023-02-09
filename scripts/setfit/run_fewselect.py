@@ -63,6 +63,7 @@ def parse_args():
     parser.add_argument("--is_test_set", type=bool, default=False)
     parser.add_argument("--cuda_device", type=int, default=0)
     parser.add_argument("--select_method", default="entropy")
+    parser.add_argument("--num_datasets", type=int, default=None)
 
     args = parser.parse_args()
 
@@ -82,7 +83,7 @@ def main():
     set_cuda_device(args.cuda_device)
 
     # full_exp_name = f"{args.model.replace('/', '-')}-{args.loss}-{args.classifier}-iterations_{args.num_iterations}-batch_{args.batch_size}-{args.exp_name}".rstrip("-")
-    full_exp_name = f"{args.select_method}-iterations_{args.num_iterations}".rstrip("-")
+    full_exp_name = f"{args.exp_name}-{args.select_method}-iterations_{args.num_iterations}".rstrip("-")
     
     parent_directory = pathlib.Path(__file__).parent.absolute()
     output_path = parent_directory / "results" / full_exp_name
@@ -108,7 +109,7 @@ def main():
         dataset_to_metric = {args.eval_dataset: metric}
 
 
-    for eval_dataset, metric in dataset_to_metric.items():
+    for eval_dataset, metric in list(dataset_to_metric.items())[:args.num_datasets]:
         results_path = create_results_path(eval_dataset, f"train-{args.select_sample_size}-0", output_path)
         if os.path.exists(results_path) and args.allow_skip:
             print(f"Skipping finished experiment: {results_path}")

@@ -60,6 +60,7 @@ def parse_args():
     parser.add_argument("--keep_body_frozen", default=False, action="store_true")
     parser.add_argument("--disable_data_augmentation", default=False, action="store_true")
     parser.add_argument("--is_dev_set", type=bool, default=True)
+    parser.add_argument("--short_run", type=bool, default=True)
     parser.add_argument("--is_test_set", type=bool, default=False)
     parser.add_argument("--cuda_device", type=int, default=0)
     parser.add_argument("--select_method", default="entropy")
