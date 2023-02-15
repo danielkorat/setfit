@@ -156,6 +156,7 @@ def create_summary_table(results_path: str) -> None:
             print(", ".join(line))
     print("=" * 80)
     print(f"Saved summary table to {output_path}")
+    return f"{overall_average:.1f}"
 
 
 def main() -> None:

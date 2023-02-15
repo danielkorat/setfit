@@ -178,35 +178,6 @@ def get_top_n_by_criterion(data: Dataset, n: int, criterion_data) -> Dataset:
     return data.add_column("criterion", criterion_data).sort("criterion").select(range(n)).remove_columns("criterion")
 
 
-def select_few_shot_examples(probablities, data: Dataset, sample_size: int, num_labels: int, select_method: str):
-    total_samples = sample_size * num_labels
-    if select_method == "entropy":
-        certainties = -entropy(probablities, base=2, axis=1)
-        selected_data = get_top_n_by_criterion(data, total_samples, certainties)
-
-    elif select_method == "top_2_diff":
-        transposed = np.sort(probablities).transpose()
-        certainties = transposed[-1] - transposed[-2]
-        selected_data = get_top_n_by_criterion(data, total_samples, certainties)
-
-    elif select_method == "top_2_and_rand":
-        transposed = np.sort(probablities).transpose()
-        certainties = transposed[-1] - transposed[-2]
-        n_top_samples = int(total_samples * 0.7)
-        selected_data = get_top_n_by_criterion(data, n_top_samples, certainties)
-        random_data = data.shuffle(seed=0).select(range(total_samples - n_top_samples))
-        selected_data = concatenate_datasets([selected_data, random_data])
-    
-    else:
-        raise ValueError("Invalid `--select_method`!")
-
-
-    print("\n\n=========================================================")
-    print(f"Selected label counts: {Counter(selected_data['label']).items()}")
-    print("=========================================================\n\n")
-    return selected_data
-
-
 def create_fewshot_splits(
     dataset: Dataset,
     sample_sizes: List[int],

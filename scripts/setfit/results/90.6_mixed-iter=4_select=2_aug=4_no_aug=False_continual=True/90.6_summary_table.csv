@@ -1,0 +1,6 @@
+dataset,measure,2_avg,2_std
+sst2,accuracy,87.0,0.0
+subj,accuracy,93.4,0.0
+TREC-QC,accuracy,87.6,0.0
+bbc-news,accuracy,94.5,0.0
+Average,N/A,90.6,0.0

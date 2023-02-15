@@ -1,0 +1,10 @@
+dataset,measure,8_avg,8_std
+enron_spam,accuracy,89.3,3.3
+toxic_conversations,matthews_correlation,16.1,5.1
+student-question-categories,accuracy,79.8,2.7
+TREC-QC,accuracy,77.3,1.9
+sst2,accuracy,88.6,1.4
+imdb,accuracy,87.9,0.8
+bbc-news,accuracy,95.3,0.1
+subj,accuracy,91.2,0.9
+Average,N/A,78.2,2.0
