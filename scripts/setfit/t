@@ -1,5 +1,6 @@
 #!/bin/bash
 clear
-mkdir 
-tmux new-session -s setfit-select 'python run_fewselect_iter.py 2>&1 | tee results/hparam_sweep/log.txt'
+export HF_DATASETS_OFFLINE=0
+export TRANSFORMERS_OFFLINE=1
+tmux new-session -d -s setfit-select 'python run_fewselect_iter.py 2>&1 | tee results/hparam_sweep/log.txt'
 # tmux a

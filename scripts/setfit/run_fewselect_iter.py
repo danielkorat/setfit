@@ -22,7 +22,7 @@ from torch.cuda import set_device as set_cuda_device
 
 from setfit import SetFitModel, SetFitTrainer
 from setfit.data import get_templated_dataset
-from setfit.utils import DEV_DATASET_TO_METRIC, LOSS_NAME_TO_CLASS, TEST_DATASET_TO_METRIC
+from setfit.utils import DEV_DATASET_TO_METRIC, LOSS_NAME_TO_CLASS, TEST_DATASET_TO_METRIC, Benchmark
 
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -226,7 +226,7 @@ def get_argparser():
     parser.add_argument("--is_test_set", type=bool, default=False)
     parser.add_argument("--cuda_device", type=int, default=0)
     parser.add_argument("--select_method", default="mixed")
-    parser.add_argument("--num_datasets", type=int, default=4)
+    parser.add_argument("--num_datasets", type=int, default=3)
     parser.add_argument("--output_prefix", default="")
 
     parser.add_argument("--top_sample_size", type=float, default=0.5)
@@ -422,10 +422,10 @@ if __name__ == "__main__":
         disable_data_augmentation = [False, True],
         continual = [False, True],
         top_sample_size = [0.25, 0.5, 0.75],
-        top_range_start = [0, 1, 2],
-        top_range_end = [1, 2, 3],
-        bottom_range_start = [3, 4, 5],
-        bottom_range_end = [4, 5, 6],
+        top_range_start = [0, 1],
+        top_range_end = [1, 2],
+        bottom_range_start = [3, 4],
+        bottom_range_end = [5, 6],
     )
 
     parent_directory = pathlib.Path(__file__).parent.absolute()
@@ -442,25 +442,27 @@ if __name__ == "__main__":
             hparam_dict["bottom_range_start"] >= hparam_dict["bottom_range_end"]:
             continue
         hparam_space.append(hparam_dict)
-    print(f"Total number of experiments: {len(hparam_space)}")
+    
 
     # Run experiments
+    start_from = 2
+    bench = Benchmark()
     max_average_score = -1
-    for i, hparam_set in enumerate(hparam_space):
-        args = ["--exp_name", f"experiment_{i}", "--output_prefix", "hparam_sweep"]
+    for i, hparam_set in list(enumerate(hparam_space))[start_from:]:
+        with bench.track(f"Experiment_{i}"):
+            # Experiment name and constant arguments
+            args = ["--exp_name", f"experiment_{i}", "--output_prefix", "hparam_sweep"]
 
-        for arg_name, arg_value in hparam_dict.items():
-            if type(arg_value) is bool:
-                arg_value = "True" if arg_value else ""
-            else:
-                arg_value = str(arg_value)
+            # Prepare argument list
+            for arg_name, arg_value in hparam_set.items():
+                if type(arg_value) is bool:
+                    arg_value = "True" if arg_value else ""
+                args.extend([f"--{arg_name}", str(arg_value)])
 
-            args.extend([f"--{arg_name}", arg_value])
+            average_score = main(args)
 
-        average_score = main(args)
-
-        if average_score > max_average_score:
-            max_average_score = average_score
-            with open(output_path / "best_score.txt", "w") as f:
-                f.write(f"score: {max_average_score}\nExperiment no: {i}\n\n")
-                f.write(f"Hparams set:\n\n{json.dumps(hparam_dict)}")
+            if average_score > max_average_score:
+                max_average_score = average_score
+                with open(output_path / "best_score.txt", "w") as f:
+                    f.write(f"score: {max_average_score}\nExperiment no: {i}\n\n")
+                    f.write(f"Hparams set:\n\n{json.dumps(hparam_dict, indent=2)}")
