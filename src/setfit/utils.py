@@ -14,10 +14,10 @@ SEC_TO_NS_SCALE = 1000000000
 
 
 DEV_DATASET_TO_METRIC = {
-    "TREC-QC": "accuracy",
-    "sst2": "accuracy",
-    "bbc-news": "accuracy",
     "subj": "accuracy",
+    "sst2": "accuracy",
+    "TREC-QC": "accuracy",
+    "bbc-news": "accuracy",
     "imdb": "accuracy",    
     "enron_spam": "accuracy",
     "student-question-categories": "accuracy",

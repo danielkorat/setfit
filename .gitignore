@@ -151,3 +151,4 @@ scripts/tfew/run_tmux.sh
 .vscode/settings.json
 tmux
 scripts/setfit/*.txt
+scripts/setfit/results

@@ -1,4 +1,3 @@
-from collections import Counter
 import warnings
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
 
@@ -172,10 +171,6 @@ def sample_dataset(dataset: Dataset, label_column: str = "label", num_samples: i
 
     all_samples = concatenate_datasets(samples)
     return all_samples.shuffle(seed=seed)
-
-
-def get_top_n_by_criterion(data: Dataset, n: int, criterion_data) -> Dataset:
-    return data.add_column("criterion", criterion_data).sort("criterion").select(range(n)).remove_columns("criterion")
 
 
 def create_fewshot_splits(

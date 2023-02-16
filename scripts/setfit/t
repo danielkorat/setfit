@@ -1,0 +1,5 @@
+#!/bin/bash
+clear
+mkdir 
+tmux new-session -s setfit-select 'python run_fewselect_iter.py 2>&1 | tee results/hparam_sweep/log.txt'
+# tmux a
