@@ -72,11 +72,11 @@ class TrainingArguments:
             The loss function to use for contrastive training of the embedding training phase.
         distance_metric (`Callable`, defaults to `BatchHardTripletLossDistanceFunction.cosine_distance`):
             Function that returns a distance between two embeddings.
-            It is set for the triplet loss and ignored for `CosineSimilarityLoss` and `SupConLoss`.
+            It is set for the triplet loss and ignored for `CosineSimilarityLoss`, `SupConLoss` and `SINCERELoss`.
         margin (`float`, defaults to `0.25`):
             Margin for the triplet loss.
             Negative samples should be at least margin further apart from the anchor than the positive.
-            It is ignored for `CosineSimilarityLoss`, `BatchHardSoftMarginTripletLoss` and `SupConLoss`.
+            It is ignored for `CosineSimilarityLoss`, `BatchHardSoftMarginTripletLoss`, `SupConLoss` and `SINCERELoss`.
         end_to_end (`bool`, defaults to `False`):
             If True, train the entire model end-to-end during the classifier training phase.
             Otherwise, freeze the `SentenceTransformer` body and only train the head.

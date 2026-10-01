@@ -14,7 +14,7 @@ from transformers.utils.hp_naming import TrialShortNamer
 
 from setfit import logging
 from setfit.compat import losses
-from setfit.losses import SupConLoss
+from setfit.losses import SINCERELoss, SupConLoss
 from setfit.modeling import SetFitModel
 from setfit.trainer import Trainer
 from setfit.training_args import TrainingArguments
@@ -445,6 +445,7 @@ class TrainerHyperParameterOptunaIntegrationTest(TestCase):
         losses.BatchSemiHardTripletLoss,
         losses.BatchHardSoftMarginTripletLoss,
         SupConLoss,
+        SINCERELoss,
     ],
 )
 def test_trainer_works_with_non_default_loss_class(loss_class):

@@ -98,3 +98,44 @@ class SupConLoss(nn.Module):
         loss = loss.view(anchor_count, batch_size).mean()
 
         return loss
+
+
+class SINCERELoss(nn.Module):
+    """Supervised InfoNCE REvisited (SINCERE): https://arxiv.org/abs/2309.14277.
+
+    Like `SupConLoss`, every other sample of the anchor's class is a positive. Unlike `SupConLoss`, the
+    softmax denominator of each anchor-positive pair holds only that positive and the samples of *other*
+    classes. SupCon also puts the anchor's remaining same-class samples in that denominator, which pushes
+    them away from the anchor ("intra-class repulsion"), and more so the more same-class samples a batch has.
+    """
+
+    def __init__(self, model, temperature: float = 0.07) -> None:
+        super().__init__()
+        self.model = model
+        self.temperature = temperature
+
+    def forward(self, sentence_features, labels):
+        features = self.model(sentence_features[0])["sentence_embedding"]
+        features = torch.nn.functional.normalize(features, p=2, dim=1)
+        return self.loss_from_logits(features @ features.T / self.temperature, labels)
+
+    @staticmethod
+    def loss_from_logits(logits: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
+        """SINCERE loss for a (batch, batch) matrix of temperature-scaled similarities.
+
+        For anchor i and positive p: -log(exp(s_ip) / (exp(s_ip) + sum_{n: y_n != y_i} exp(s_in))),
+        averaged over the positives of each anchor, then over the anchors that have a positive.
+        """
+        labels = labels.view(-1)
+        same_class = labels[:, None] == labels[None, :]
+        positives = same_class & ~torch.eye(len(labels), dtype=torch.bool, device=logits.device)
+
+        # log sum_n exp(s_in) over other-class samples; -inf when the batch has no other class
+        negatives_lse = torch.logsumexp(logits.masked_fill(same_class, float("-inf")), dim=1, keepdim=True)
+        # log of each pair's denominator, exp(s_ip) + sum_n exp(s_in), computed stably
+        log_prob = logits - torch.logaddexp(logits, negatives_lse)
+
+        num_positives = positives.sum(1)
+        has_positive = num_positives > 0
+        per_anchor = -(log_prob * positives).sum(1)[has_positive] / num_positives[has_positive]
+        return per_anchor.mean()

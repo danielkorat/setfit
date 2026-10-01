@@ -9,7 +9,7 @@ from transformers.utils import copy_func
 
 from .compat import losses
 from .data import create_fewshot_splits, create_fewshot_splits_multilabel
-from .losses import SupConLoss
+from .losses import SINCERELoss, SupConLoss
 
 
 SEC_TO_NS_SCALE = 1000000000
@@ -48,6 +48,7 @@ LOSS_NAME_TO_CLASS = {
     "BatchHardTripletLoss": losses.BatchHardTripletLoss,
     "BatchHardSoftMarginTripletLoss": losses.BatchHardSoftMarginTripletLoss,
     "SupConLoss": SupConLoss,
+    "SINCERELoss": SINCERELoss,
 }
 
 

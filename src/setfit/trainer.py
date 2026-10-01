@@ -17,7 +17,7 @@ from setfit.model_card import ModelCardCallback
 from . import logging
 from .compat import TRANSFORMERS_VERSION, BatchSamplers, SentenceTransformerModelCardCallback, Version, losses
 from .integrations import default_hp_search_backend, is_optuna_available, run_hp_search_optuna
-from .losses import SupConLoss
+from .losses import SINCERELoss, SupConLoss
 from .sampler import ContrastiveDataset
 from .training_args import TrainingArguments
 from .utils import BestRun, default_hp_space_optuna
@@ -582,6 +582,7 @@ class Trainer(ColumnMappingMixin):
             losses.BatchSemiHardTripletLoss,
             losses.BatchHardSoftMarginTripletLoss,
             SupConLoss,
+            SINCERELoss,
         ):
             self.st_trainer.args.batch_sampler = BatchSamplers.GROUP_BY_LABEL
         self.st_trainer.train()
@@ -595,6 +596,7 @@ class Trainer(ColumnMappingMixin):
             losses.BatchSemiHardTripletLoss,
             losses.BatchHardSoftMarginTripletLoss,
             SupConLoss,
+            SINCERELoss,
         ]:
             dataset = Dataset.from_dict({"sentence": x, "label": y})
 
@@ -603,7 +605,7 @@ class Trainer(ColumnMappingMixin):
                     model=self.model.model_body,
                     distance_metric=args.distance_metric,
                 )
-            elif args.loss is SupConLoss:
+            elif args.loss in (SupConLoss, SINCERELoss):
                 loss = args.loss(model=self.model.model_body)
             else:
                 loss = args.loss(
