@@ -74,4 +74,5 @@ python run.py --only main-n8 --datasets emotion sst5 SentEval-CR amazon_counterf
 python run.py --only main-n64 --datasets SentEval-CR --limit-splits 5
 ```
 
-Per-run records (scores, step counts, timings, versions, git commit) are in `runs/`.
+Per-run records (scores, step counts, timings, versions, git commit) are written to `runs/`, which the repo's
+`.gitignore` excludes (`runs/` rule), so they are not in git. `python analyze.py` rebuilds the tables from them.
