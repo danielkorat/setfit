@@ -42,7 +42,7 @@ process: OpenVINO's exporter crashes under tcmalloc, which `run.sh` preloads on 
 Recorded on a 4-core Xeon (AVX-512 + VNNI, no bf16/AMX) with 16 GB RAM, fp32.
 
 - `probe_bge-small_cpu` used batch size 32.
-- `probe_bge-base_cpu` and `probe_mpnet-base_cpu` used batch size 16. Its training times are inflated where another job shared the CPU.
+- `probe_bge-base_cpu` and `probe_mpnet-base_cpu` used batch size 16. bge-base's SST-2 and AG News training times are inflated because another job shared the CPU.
 - The bge-small Enron 8-shot result was lost to an out-of-memory kill.
 
 | dataset | body | shots/class | SetFit | Jev | gpt-5.4-mini | gpt-5.6-luna | train s | batch-1 p50 ms |
