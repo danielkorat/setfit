@@ -1,0 +1,78 @@
+# SetFit vs Jev and small LLMs on jev-eval
+
+Compares few-shot and zero-shot SetFit with TypeSafe's Jev (`jev-1.13.0`), `gpt-5.4-mini` and `gpt-5.6-luna` on the
+exact test items of [onlyoneaman/jev-eval](https://github.com/onlyoneaman/jev-eval): 300 items each from Enron spam,
+SST-2, AG News and Banking77. That repo commits every case and every model's answer, so SetFit is scored on the same
+items without calling any API.
+
+- **Test items**: the committed cases (`--n_test N` takes the first N, which the probe sets to 100).
+- **Training items**: sampled per class from each dataset's *train* split. The test items come from the test split (validation for SST-2), and exact-text overlaps are removed anyway.
+- **Zero-shot**: SetFit's templated synthetic examples, built from the same one-line label descriptions Jev and the LLMs received.
+- **Inputs**: identical to jev-eval's, including `Subject: …\n\n<message[:4000]>` for Enron.
+
+## Run
+
+```bash
+cd benchmarks/jev_eval
+./fetch_jev_eval.sh                       # pinned jev-eval checkout (cases + Jev/LLM answers)
+uv venv && source .venv/bin/activate
+uv pip install torch                      # Linux CPU-only: --index-url https://download.pytorch.org/whl/cpu
+uv pip install -e ../.. "optimum-intel[openvino]" openvino onnxruntime scikit-learn
+
+# probe: 100 test items per dataset, 8 examples/class
+./run.sh --model BAAI/bge-base-en-v1.5 --datasets sst2,ag_news,enron_spam,banking77 --shots 8 \
+  --n_test 100 --batch_size 16 --max_steps 600 --latency 50 --out out_probe
+python summarize.py out_probe
+```
+
+`--device auto` picks CUDA, then Apple MPS, then CPU. `--precision auto` uses bf16 where the hardware has it natively,
+fp16 on CUDA GPUs without bf16, and fp32 otherwise, including MPS until bf16 is benchmarked there
+(`--precision bf16` to try it). Latency is measured at batch size 1 for PyTorch, OpenVINO and OpenVINO int8, in a child
+process: OpenVINO's exporter crashes under tcmalloc, which `run.sh` preloads on Linux.
+
+## Caveats
+
+- **Banking77 covers only 25 of 77 intents.** jev-eval samples whole 100-row pages and the test split is grouped by intent. Every model was still offered all 77 options, and SetFit trains on all 77.
+- **Enron is truncated.** `--max_length 256` (the default) cuts long emails, while Jev saw up to 4,000 characters.
+- **SetFit's probabilities are less extreme than Jev's.** With a logistic-regression head, none of SetFit's answers reached 0.9 confidence, so "accurate when confident" needs a calibrated threshold before it compares fairly.
+- **Memory.** On a 16 GB machine, Enron at batch size 32 and 256 tokens peaked at about 13.7 GB with bge-small. Use batch size 16.
+
+## Results so far (CPU probe, 100 items per dataset, seed 0)
+
+Recorded on a 4-core Xeon (AVX-512 + VNNI, no bf16/AMX) with 16 GB RAM, fp32.
+
+- `probe_bge-small_cpu` used batch size 32.
+- `probe_bge-base_cpu` and `probe_mpnet-base_cpu` used batch size 16. bge-base's SST-2 and AG News training times are inflated because another job shared the CPU.
+- The bge-small Enron 8-shot result was lost to an out-of-memory kill.
+
+| dataset | body | shots/class | SetFit | Jev | gpt-5.4-mini | gpt-5.6-luna | train s | batch-1 p50 ms |
+|---|---|---|---|---|---|---|---|---|
+| ag_news | bge-small | 0 | 77 | 90 | 89 | 89 | 39 | – |
+| ag_news | bge-small | 8 | 87 | 90 | 89 | 89 | 145 | torch 87, OpenVINO 40, OpenVINO int8 28 |
+| enron_spam | bge-small | 0 | 57 | 98 | 99 | 99 | 24 | – |
+| sst2 | bge-small | 0 | 87 | 96 | 95 | 96 | 18 | – |
+| sst2 | bge-small | 8 | 89 | 96 | 95 | 96 | 27 | torch 64, OpenVINO 25, OpenVINO int8 17 |
+| sst2 | bge-base | 8 | 91 | 96 | 95 | 96 | 84 | torch 197, OpenVINO 66, OpenVINO int8 40 |
+| ag_news | bge-base | 8 | 87 | 90 | 89 | 89 | 614 | torch 224, OpenVINO 112, OpenVINO int8 69 |
+| enron_spam | bge-base | 8 | 87 | 98 | 99 | 99 | 740 | torch 382, OpenVINO 300, OpenVINO int8 197 |
+| banking77 | bge-base | 8 | **82** | 76 | 75 | 78 | 1419 | torch 123, OpenVINO 57, OpenVINO int8 27 |
+| sst2 | all-mpnet-base | 8 | 93 | 96 | 95 | 96 | 74 | torch 194, OpenVINO 69, OpenVINO int8 36 |
+| ag_news | all-mpnet-base | 8 | 88 | 90 | 89 | 89 | 320 | torch 232, OpenVINO 112, OpenVINO int8 62 |
+| enron_spam | all-mpnet-base | 8 | 94 | 98 | 99 | 99 | 715 | torch 397, OpenVINO 273, OpenVINO int8 194 |
+| banking77 | all-mpnet-base | 8 | **79** | 76 | 75 | 78 | 1409 | torch 108, OpenVINO 55, OpenVINO int8 25 |
+| sst2 | bge-base | 0 | 87 | 96 | 95 | 96 | 48 | – |
+| ag_news | bge-base | 0 | 77 | 90 | 89 | 89 | 96 | – |
+| enron_spam | bge-base | 0 | 50 | 98 | 99 | 99 | 58 | – |
+| banking77 | bge-base | 0 | 62 | 76 | 75 | 78 | 641 | – |
+| sst2 | all-mpnet-base | 0 | 81 | 96 | 95 | 96 | 45 | – |
+| ag_news | all-mpnet-base | 0 | 77 | 90 | 89 | 89 | 98 | – |
+| enron_spam | all-mpnet-base | 0 | 48 | 98 | 99 | 99 | 60 | – |
+| banking77 | all-mpnet-base | 0 | 57 | 76 | 75 | 78 | 635 | – |
+
+Zero-shot SetFit (templated examples from the label descriptions) trails Jev by 9–50 points with every body tried, and
+is at chance on Enron, where short templated sentences don't resemble the long test emails. With 8 labeled examples
+per class, all-mpnet-base is within 2–4 points of Jev on SST-2, AG News and Enron, and ahead of Jev and both GPT models
+on Banking77.
+
+OpenVINO matched PyTorch's accuracy on every run. OpenVINO int8 stayed within one point: bge-base Enron 86 vs 87, all-mpnet-base Banking77 78 vs 79, and all-mpnet-base SST-2 94 vs 93. For comparison, Jev took 0.8–0.9 s per call
+in jev-eval, including the network round trip.

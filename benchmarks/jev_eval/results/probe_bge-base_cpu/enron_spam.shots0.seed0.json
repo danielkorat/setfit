@@ -1,0 +1,563 @@
+{
+ "dataset": "enron_spam",
+ "shots": 0,
+ "seed": 0,
+ "bf16": false,
+ "n_train": 16,
+ "n_test": 100,
+ "accuracy": 0.5,
+ "confident_share": 0.0,
+ "confident_accuracy": null,
+ "train_seconds": 57.64297899600024,
+ "batched_infer_ms_per_item": 97.87482400999579,
+ "predictions": [
+  {
+   "id": "enron_spam:0",
+   "pred": "ham",
+   "proba": 0.5044256448745728
+  },
+  {
+   "id": "enron_spam:1",
+   "pred": "spam",
+   "proba": 0.5416680574417114
+  },
+  {
+   "id": "enron_spam:2",
+   "pred": "spam",
+   "proba": 0.5413400530815125
+  },
+  {
+   "id": "enron_spam:3",
+   "pred": "spam",
+   "proba": 0.5208654403686523
+  },
+  {
+   "id": "enron_spam:4",
+   "pred": "spam",
+   "proba": 0.5370529890060425
+  },
+  {
+   "id": "enron_spam:5",
+   "pred": "ham",
+   "proba": 0.5373915433883667
+  },
+  {
+   "id": "enron_spam:6",
+   "pred": "spam",
+   "proba": 0.6164827346801758
+  },
+  {
+   "id": "enron_spam:7",
+   "pred": "ham",
+   "proba": 0.5034036040306091
+  },
+  {
+   "id": "enron_spam:8",
+   "pred": "spam",
+   "proba": 0.5307954549789429
+  },
+  {
+   "id": "enron_spam:9",
+   "pred": "spam",
+   "proba": 0.5511904954910278
+  },
+  {
+   "id": "enron_spam:10",
+   "pred": "spam",
+   "proba": 0.5018670558929443
+  },
+  {
+   "id": "enron_spam:11",
+   "pred": "spam",
+   "proba": 0.6673924922943115
+  },
+  {
+   "id": "enron_spam:12",
+   "pred": "ham",
+   "proba": 0.6084477305412292
+  },
+  {
+   "id": "enron_spam:13",
+   "pred": "spam",
+   "proba": 0.5752444267272949
+  },
+  {
+   "id": "enron_spam:14",
+   "pred": "spam",
+   "proba": 0.5176554918289185
+  },
+  {
+   "id": "enron_spam:15",
+   "pred": "spam",
+   "proba": 0.5076848268508911
+  },
+  {
+   "id": "enron_spam:16",
+   "pred": "spam",
+   "proba": 0.5663779377937317
+  },
+  {
+   "id": "enron_spam:17",
+   "pred": "spam",
+   "proba": 0.5519286394119263
+  },
+  {
+   "id": "enron_spam:18",
+   "pred": "spam",
+   "proba": 0.5603617429733276
+  },
+  {
+   "id": "enron_spam:19",
+   "pred": "spam",
+   "proba": 0.5140959024429321
+  },
+  {
+   "id": "enron_spam:20",
+   "pred": "spam",
+   "proba": 0.570199191570282
+  },
+  {
+   "id": "enron_spam:21",
+   "pred": "ham",
+   "proba": 0.564363956451416
+  },
+  {
+   "id": "enron_spam:22",
+   "pred": "spam",
+   "proba": 0.5495604276657104
+  },
+  {
+   "id": "enron_spam:23",
+   "pred": "spam",
+   "proba": 0.5749634504318237
+  },
+  {
+   "id": "enron_spam:24",
+   "pred": "spam",
+   "proba": 0.6036360859870911
+  },
+  {
+   "id": "enron_spam:25",
+   "pred": "spam",
+   "proba": 0.5167813301086426
+  },
+  {
+   "id": "enron_spam:26",
+   "pred": "spam",
+   "proba": 0.5730401277542114
+  },
+  {
+   "id": "enron_spam:27",
+   "pred": "spam",
+   "proba": 0.5533769130706787
+  },
+  {
+   "id": "enron_spam:28",
+   "pred": "ham",
+   "proba": 0.5409364700317383
+  },
+  {
+   "id": "enron_spam:29",
+   "pred": "spam",
+   "proba": 0.5400306582450867
+  },
+  {
+   "id": "enron_spam:30",
+   "pred": "spam",
+   "proba": 0.5255502462387085
+  },
+  {
+   "id": "enron_spam:31",
+   "pred": "spam",
+   "proba": 0.5465458631515503
+  },
+  {
+   "id": "enron_spam:32",
+   "pred": "spam",
+   "proba": 0.5236419439315796
+  },
+  {
+   "id": "enron_spam:33",
+   "pred": "spam",
+   "proba": 0.5214681625366211
+  },
+  {
+   "id": "enron_spam:34",
+   "pred": "spam",
+   "proba": 0.5669833421707153
+  },
+  {
+   "id": "enron_spam:35",
+   "pred": "spam",
+   "proba": 0.5253458023071289
+  },
+  {
+   "id": "enron_spam:36",
+   "pred": "spam",
+   "proba": 0.5248935222625732
+  },
+  {
+   "id": "enron_spam:37",
+   "pred": "ham",
+   "proba": 0.515422523021698
+  },
+  {
+   "id": "enron_spam:38",
+   "pred": "ham",
+   "proba": 0.5584937334060669
+  },
+  {
+   "id": "enron_spam:39",
+   "pred": "ham",
+   "proba": 0.5310446619987488
+  },
+  {
+   "id": "enron_spam:40",
+   "pred": "spam",
+   "proba": 0.5056824684143066
+  },
+  {
+   "id": "enron_spam:41",
+   "pred": "spam",
+   "proba": 0.5883381366729736
+  },
+  {
+   "id": "enron_spam:42",
+   "pred": "spam",
+   "proba": 0.5394885540008545
+  },
+  {
+   "id": "enron_spam:43",
+   "pred": "spam",
+   "proba": 0.581832766532898
+  },
+  {
+   "id": "enron_spam:44",
+   "pred": "spam",
+   "proba": 0.5188337564468384
+  },
+  {
+   "id": "enron_spam:45",
+   "pred": "spam",
+   "proba": 0.5391968488693237
+  },
+  {
+   "id": "enron_spam:46",
+   "pred": "spam",
+   "proba": 0.5971729755401611
+  },
+  {
+   "id": "enron_spam:47",
+   "pred": "spam",
+   "proba": 0.5056690573692322
+  },
+  {
+   "id": "enron_spam:48",
+   "pred": "ham",
+   "proba": 0.5493170619010925
+  },
+  {
+   "id": "enron_spam:49",
+   "pred": "spam",
+   "proba": 0.5224824547767639
+  },
+  {
+   "id": "enron_spam:50",
+   "pred": "ham",
+   "proba": 0.5446159839630127
+  },
+  {
+   "id": "enron_spam:51",
+   "pred": "spam",
+   "proba": 0.5173090696334839
+  },
+  {
+   "id": "enron_spam:52",
+   "pred": "spam",
+   "proba": 0.5600827932357788
+  },
+  {
+   "id": "enron_spam:53",
+   "pred": "spam",
+   "proba": 0.5162862539291382
+  },
+  {
+   "id": "enron_spam:54",
+   "pred": "spam",
+   "proba": 0.6092532277107239
+  },
+  {
+   "id": "enron_spam:55",
+   "pred": "spam",
+   "proba": 0.524887204170227
+  },
+  {
+   "id": "enron_spam:56",
+   "pred": "ham",
+   "proba": 0.5442093014717102
+  },
+  {
+   "id": "enron_spam:57",
+   "pred": "spam",
+   "proba": 0.5222988128662109
+  },
+  {
+   "id": "enron_spam:58",
+   "pred": "spam",
+   "proba": 0.5074332356452942
+  },
+  {
+   "id": "enron_spam:59",
+   "pred": "spam",
+   "proba": 0.5928794145584106
+  },
+  {
+   "id": "enron_spam:60",
+   "pred": "ham",
+   "proba": 0.514966607093811
+  },
+  {
+   "id": "enron_spam:61",
+   "pred": "spam",
+   "proba": 0.5513131022453308
+  },
+  {
+   "id": "enron_spam:62",
+   "pred": "spam",
+   "proba": 0.565507173538208
+  },
+  {
+   "id": "enron_spam:63",
+   "pred": "spam",
+   "proba": 0.5476782917976379
+  },
+  {
+   "id": "enron_spam:64",
+   "pred": "spam",
+   "proba": 0.5070342421531677
+  },
+  {
+   "id": "enron_spam:65",
+   "pred": "spam",
+   "proba": 0.5696214437484741
+  },
+  {
+   "id": "enron_spam:66",
+   "pred": "spam",
+   "proba": 0.512088418006897
+  },
+  {
+   "id": "enron_spam:67",
+   "pred": "spam",
+   "proba": 0.5708182454109192
+  },
+  {
+   "id": "enron_spam:68",
+   "pred": "spam",
+   "proba": 0.5465999245643616
+  },
+  {
+   "id": "enron_spam:69",
+   "pred": "spam",
+   "proba": 0.5698081851005554
+  },
+  {
+   "id": "enron_spam:70",
+   "pred": "spam",
+   "proba": 0.5760177373886108
+  },
+  {
+   "id": "enron_spam:71",
+   "pred": "spam",
+   "proba": 0.5124609470367432
+  },
+  {
+   "id": "enron_spam:72",
+   "pred": "spam",
+   "proba": 0.5580383539199829
+  },
+  {
+   "id": "enron_spam:73",
+   "pred": "spam",
+   "proba": 0.5595698356628418
+  },
+  {
+   "id": "enron_spam:74",
+   "pred": "spam",
+   "proba": 0.5163235664367676
+  },
+  {
+   "id": "enron_spam:75",
+   "pred": "spam",
+   "proba": 0.5817205309867859
+  },
+  {
+   "id": "enron_spam:76",
+   "pred": "ham",
+   "proba": 0.5004681348800659
+  },
+  {
+   "id": "enron_spam:77",
+   "pred": "spam",
+   "proba": 0.558279275894165
+  },
+  {
+   "id": "enron_spam:78",
+   "pred": "spam",
+   "proba": 0.5044845342636108
+  },
+  {
+   "id": "enron_spam:79",
+   "pred": "spam",
+   "proba": 0.56351637840271
+  },
+  {
+   "id": "enron_spam:80",
+   "pred": "spam",
+   "proba": 0.542524516582489
+  },
+  {
+   "id": "enron_spam:81",
+   "pred": "spam",
+   "proba": 0.5194163918495178
+  },
+  {
+   "id": "enron_spam:82",
+   "pred": "ham",
+   "proba": 0.5207378268241882
+  },
+  {
+   "id": "enron_spam:83",
+   "pred": "spam",
+   "proba": 0.5390509963035583
+  },
+  {
+   "id": "enron_spam:84",
+   "pred": "spam",
+   "proba": 0.5362263321876526
+  },
+  {
+   "id": "enron_spam:85",
+   "pred": "spam",
+   "proba": 0.5749884247779846
+  },
+  {
+   "id": "enron_spam:86",
+   "pred": "spam",
+   "proba": 0.6128236055374146
+  },
+  {
+   "id": "enron_spam:87",
+   "pred": "spam",
+   "proba": 0.5315179228782654
+  },
+  {
+   "id": "enron_spam:88",
+   "pred": "ham",
+   "proba": 0.5307117700576782
+  },
+  {
+   "id": "enron_spam:89",
+   "pred": "spam",
+   "proba": 0.5480524301528931
+  },
+  {
+   "id": "enron_spam:90",
+   "pred": "spam",
+   "proba": 0.5837506651878357
+  },
+  {
+   "id": "enron_spam:91",
+   "pred": "spam",
+   "proba": 0.5828825235366821
+  },
+  {
+   "id": "enron_spam:92",
+   "pred": "spam",
+   "proba": 0.5563273429870605
+  },
+  {
+   "id": "enron_spam:93",
+   "pred": "spam",
+   "proba": 0.5301148295402527
+  },
+  {
+   "id": "enron_spam:94",
+   "pred": "spam",
+   "proba": 0.549436092376709
+  },
+  {
+   "id": "enron_spam:95",
+   "pred": "spam",
+   "proba": 0.5373575687408447
+  },
+  {
+   "id": "enron_spam:96",
+   "pred": "spam",
+   "proba": 0.58299720287323
+  },
+  {
+   "id": "enron_spam:97",
+   "pred": "spam",
+   "proba": 0.508692741394043
+  },
+  {
+   "id": "enron_spam:98",
+   "pred": "spam",
+   "proba": 0.5291188955307007
+  },
+  {
+   "id": "enron_spam:99",
+   "pred": "ham",
+   "proba": 0.5538504123687744
+  }
+ ],
+ "peak_rss_gb": 2.646759033203125,
+ "peak_rss_latency_child_gb": 0.5084991455078125,
+ "baselines": {
+  "jev-latest": {
+   "n": 100,
+   "accuracy": 0.98,
+   "p50_latency_ms": 849.95,
+   "confident_share": 0.86,
+   "confident_accuracy": 1.0
+  },
+  "gpt-5.4-mini": {
+   "n": 100,
+   "accuracy": 0.99,
+   "p50_latency_ms": 1445.4499999999998,
+   "confident_share": 0.94,
+   "confident_accuracy": 1.0
+  },
+  "gpt-5.6-luna": {
+   "n": 100,
+   "accuracy": 0.99,
+   "p50_latency_ms": 1556.6999999999998,
+   "confident_share": 0.99,
+   "confident_accuracy": 0.98989898989899
+  }
+ },
+ "env": {
+  "cpu": "x86_64",
+  "native_bf16": false,
+  "threads": 4,
+  "torch": "2.14.1+cpu",
+  "ld_preload": "/usr/lib/x86_64-linux-gnu/libtcmalloc.so.4",
+  "args": {
+   "datasets": "enron_spam",
+   "shots": "0",
+   "seeds": "0",
+   "n_test": 100,
+   "model": "BAAI/bge-base-en-v1.5",
+   "max_length": 256,
+   "batch_size": 16,
+   "num_iterations": 20,
+   "max_steps": 600,
+   "zs_per_class": 8,
+   "latency": 50,
+   "latency_min_shots": 1,
+   "no_bf16": false,
+   "out": "out_probe_bge-base-en-v1.5"
+  }
+ }
+}

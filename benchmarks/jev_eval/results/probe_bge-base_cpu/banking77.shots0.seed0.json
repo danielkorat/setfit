@@ -1,0 +1,563 @@
+{
+ "dataset": "banking77",
+ "shots": 0,
+ "seed": 0,
+ "bf16": false,
+ "n_train": 616,
+ "n_test": 100,
+ "accuracy": 0.62,
+ "confident_share": 0.0,
+ "confident_accuracy": null,
+ "train_seconds": 641.0921112080014,
+ "batched_infer_ms_per_item": 19.57965048000915,
+ "predictions": [
+  {
+   "id": "banking77:0",
+   "pred": "card about to expire",
+   "proba": 0.11999625712633133
+  },
+  {
+   "id": "banking77:1",
+   "pred": "balance not updated after cheque or cash deposit",
+   "proba": 0.05108315870165825
+  },
+  {
+   "id": "banking77:2",
+   "pred": "top up by card charge",
+   "proba": 0.05068287253379822
+  },
+  {
+   "id": "banking77:3",
+   "pred": "transfer not received by recipient",
+   "proba": 0.040002234280109406
+  },
+  {
+   "id": "banking77:4",
+   "pred": "exchange rate",
+   "proba": 0.2307799607515335
+  },
+  {
+   "id": "banking77:5",
+   "pred": "pending top up",
+   "proba": 0.0648583248257637
+  },
+  {
+   "id": "banking77:6",
+   "pred": "card about to expire",
+   "proba": 0.1416332870721817
+  },
+  {
+   "id": "banking77:7",
+   "pred": "top up reverted",
+   "proba": 0.06900834292173386
+  },
+  {
+   "id": "banking77:8",
+   "pred": "cash withdrawal not recognised",
+   "proba": 0.2576513886451721
+  },
+  {
+   "id": "banking77:9",
+   "pred": "cash withdrawal charge",
+   "proba": 0.16736505925655365
+  },
+  {
+   "id": "banking77:10",
+   "pred": "pending top up",
+   "proba": 0.08296950906515121
+  },
+  {
+   "id": "banking77:11",
+   "pred": "top up by cash or cheque",
+   "proba": 0.2418941855430603
+  },
+  {
+   "id": "banking77:12",
+   "pred": "top up failed",
+   "proba": 0.0747041404247284
+  },
+  {
+   "id": "banking77:13",
+   "pred": "lost or stolen card",
+   "proba": 0.14291608333587646
+  },
+  {
+   "id": "banking77:14",
+   "pred": "top up by cash or cheque",
+   "proba": 0.1298229992389679
+  },
+  {
+   "id": "banking77:15",
+   "pred": "exchange rate",
+   "proba": 0.06351786106824875
+  },
+  {
+   "id": "banking77:16",
+   "pred": "top up by card charge",
+   "proba": 0.044847119599580765
+  },
+  {
+   "id": "banking77:17",
+   "pred": "terminate account",
+   "proba": 0.059814926236867905
+  },
+  {
+   "id": "banking77:18",
+   "pred": "card acceptance",
+   "proba": 0.05971070006489754
+  },
+  {
+   "id": "banking77:19",
+   "pred": "balance not updated after cheque or cash deposit",
+   "proba": 0.11679115891456604
+  },
+  {
+   "id": "banking77:20",
+   "pred": "activate my card",
+   "proba": 0.17757442593574524
+  },
+  {
+   "id": "banking77:21",
+   "pred": "card linking",
+   "proba": 0.11411543190479279
+  },
+  {
+   "id": "banking77:22",
+   "pred": "top up reverted",
+   "proba": 0.02999161183834076
+  },
+  {
+   "id": "banking77:23",
+   "pred": "activate my card",
+   "proba": 0.2965813875198364
+  },
+  {
+   "id": "banking77:24",
+   "pred": "get physical card",
+   "proba": 0.06022321432828903
+  },
+  {
+   "id": "banking77:25",
+   "pred": "balance not updated after bank transfer",
+   "proba": 0.14002148807048798
+  },
+  {
+   "id": "banking77:26",
+   "pred": "transfer fee charged",
+   "proba": 0.08868273347616196
+  },
+  {
+   "id": "banking77:27",
+   "pred": "transfer into account",
+   "proba": 0.046926334500312805
+  },
+  {
+   "id": "banking77:28",
+   "pred": "pending top up",
+   "proba": 0.07516873627901077
+  },
+  {
+   "id": "banking77:29",
+   "pred": "card payment wrong exchange rate",
+   "proba": 0.222255140542984
+  },
+  {
+   "id": "banking77:30",
+   "pred": "card linking",
+   "proba": 0.11381292343139648
+  },
+  {
+   "id": "banking77:31",
+   "pred": "top up by card charge",
+   "proba": 0.14062346518039703
+  },
+  {
+   "id": "banking77:32",
+   "pred": "balance not updated after cheque or cash deposit",
+   "proba": 0.06379169225692749
+  },
+  {
+   "id": "banking77:33",
+   "pred": "cash withdrawal not recognised",
+   "proba": 0.07746434956789017
+  },
+  {
+   "id": "banking77:34",
+   "pred": "card linking",
+   "proba": 0.029283426702022552
+  },
+  {
+   "id": "banking77:35",
+   "pred": "order physical card",
+   "proba": 0.10914605855941772
+  },
+  {
+   "id": "banking77:36",
+   "pred": "order physical card",
+   "proba": 0.039618656039237976
+  },
+  {
+   "id": "banking77:37",
+   "pred": "cancel transfer",
+   "proba": 0.07798155397176743
+  },
+  {
+   "id": "banking77:38",
+   "pred": "transfer not received by recipient",
+   "proba": 0.057565703988075256
+  },
+  {
+   "id": "banking77:39",
+   "pred": "transaction charged twice",
+   "proba": 0.047610897570848465
+  },
+  {
+   "id": "banking77:40",
+   "pred": "card linking",
+   "proba": 0.10735282301902771
+  },
+  {
+   "id": "banking77:41",
+   "pred": "card payment wrong exchange rate",
+   "proba": 0.18438571691513062
+  },
+  {
+   "id": "banking77:42",
+   "pred": "extra charge on statement",
+   "proba": 0.0763111338019371
+  },
+  {
+   "id": "banking77:43",
+   "pred": "cash withdrawal not recognised",
+   "proba": 0.06948993355035782
+  },
+  {
+   "id": "banking77:44",
+   "pred": "activate my card",
+   "proba": 0.23715883493423462
+  },
+  {
+   "id": "banking77:45",
+   "pred": "extra charge on statement",
+   "proba": 0.05347245931625366
+  },
+  {
+   "id": "banking77:46",
+   "pred": "supported cards and currencies",
+   "proba": 0.057788968086242676
+  },
+  {
+   "id": "banking77:47",
+   "pred": "exchange rate",
+   "proba": 0.20271232724189758
+  },
+  {
+   "id": "banking77:48",
+   "pred": "pending transfer",
+   "proba": 0.06398691982030869
+  },
+  {
+   "id": "banking77:49",
+   "pred": "transfer fee charged",
+   "proba": 0.07453733682632446
+  },
+  {
+   "id": "banking77:50",
+   "pred": "apple pay or google pay",
+   "proba": 0.07465585321187973
+  },
+  {
+   "id": "banking77:51",
+   "pred": "card payment wrong exchange rate",
+   "proba": 0.3070412278175354
+  },
+  {
+   "id": "banking77:52",
+   "pred": "reverted card payment?",
+   "proba": 0.09791991859674454
+  },
+  {
+   "id": "banking77:53",
+   "pred": "top up by cash or cheque",
+   "proba": 0.034995533525943756
+  },
+  {
+   "id": "banking77:54",
+   "pred": "balance not updated after cheque or cash deposit",
+   "proba": 0.04929444566369057
+  },
+  {
+   "id": "banking77:55",
+   "pred": "card about to expire",
+   "proba": 0.15799181163311005
+  },
+  {
+   "id": "banking77:56",
+   "pred": "apple pay or google pay",
+   "proba": 0.05344889312982559
+  },
+  {
+   "id": "banking77:57",
+   "pred": "exchange rate",
+   "proba": 0.1877770870923996
+  },
+  {
+   "id": "banking77:58",
+   "pred": "order physical card",
+   "proba": 0.05325332283973694
+  },
+  {
+   "id": "banking77:59",
+   "pred": "exchange rate",
+   "proba": 0.20997822284698486
+  },
+  {
+   "id": "banking77:60",
+   "pred": "order physical card",
+   "proba": 0.05477205291390419
+  },
+  {
+   "id": "banking77:61",
+   "pred": "top up reverted",
+   "proba": 0.1809849590063095
+  },
+  {
+   "id": "banking77:62",
+   "pred": "extra charge on statement",
+   "proba": 0.03640449419617653
+  },
+  {
+   "id": "banking77:63",
+   "pred": "top up by cash or cheque",
+   "proba": 0.16523486375808716
+  },
+  {
+   "id": "banking77:64",
+   "pred": "card payment wrong exchange rate",
+   "proba": 0.16512417793273926
+  },
+  {
+   "id": "banking77:65",
+   "pred": "pending cash withdrawal",
+   "proba": 0.04534455016255379
+  },
+  {
+   "id": "banking77:66",
+   "pred": "transfer not received by recipient",
+   "proba": 0.053091589361429214
+  },
+  {
+   "id": "banking77:67",
+   "pred": "card arrival",
+   "proba": 0.08792681246995926
+  },
+  {
+   "id": "banking77:68",
+   "pred": "card payment wrong exchange rate",
+   "proba": 0.2849075198173523
+  },
+  {
+   "id": "banking77:69",
+   "pred": "transfer fee charged",
+   "proba": 0.2392599731683731
+  },
+  {
+   "id": "banking77:70",
+   "pred": "exchange rate",
+   "proba": 0.20072638988494873
+  },
+  {
+   "id": "banking77:71",
+   "pred": "transfer not received by recipient",
+   "proba": 0.14016093313694
+  },
+  {
+   "id": "banking77:72",
+   "pred": "cash withdrawal charge",
+   "proba": 0.12176051735877991
+  },
+  {
+   "id": "banking77:73",
+   "pred": "supported cards and currencies",
+   "proba": 0.08067968487739563
+  },
+  {
+   "id": "banking77:74",
+   "pred": "top up by cash or cheque",
+   "proba": 0.25501275062561035
+  },
+  {
+   "id": "banking77:75",
+   "pred": "card payment wrong exchange rate",
+   "proba": 0.15167111158370972
+  },
+  {
+   "id": "banking77:76",
+   "pred": "declined card payment",
+   "proba": 0.0622454471886158
+  },
+  {
+   "id": "banking77:77",
+   "pred": "transfer fee charged",
+   "proba": 0.10086057335138321
+  },
+  {
+   "id": "banking77:78",
+   "pred": "exchange charge",
+   "proba": 0.08524178713560104
+  },
+  {
+   "id": "banking77:79",
+   "pred": "cash withdrawal not recognised",
+   "proba": 0.09267384558916092
+  },
+  {
+   "id": "banking77:80",
+   "pred": "get physical card",
+   "proba": 0.061547715216875076
+  },
+  {
+   "id": "banking77:81",
+   "pred": "cash withdrawal charge",
+   "proba": 0.16292333602905273
+  },
+  {
+   "id": "banking77:82",
+   "pred": "balance not updated after cheque or cash deposit",
+   "proba": 0.21082328259944916
+  },
+  {
+   "id": "banking77:83",
+   "pred": "get physical card",
+   "proba": 0.09793853014707565
+  },
+  {
+   "id": "banking77:84",
+   "pred": "exchange rate",
+   "proba": 0.06974759697914124
+  },
+  {
+   "id": "banking77:85",
+   "pred": "declined transfer",
+   "proba": 0.07031246274709702
+  },
+  {
+   "id": "banking77:86",
+   "pred": "card payment fee charged",
+   "proba": 0.057280272245407104
+  },
+  {
+   "id": "banking77:87",
+   "pred": "exchange rate",
+   "proba": 0.2627924382686615
+  },
+  {
+   "id": "banking77:88",
+   "pred": "transfer fee charged",
+   "proba": 0.11935746669769287
+  },
+  {
+   "id": "banking77:89",
+   "pred": "receiving money",
+   "proba": 0.10188962519168854
+  },
+  {
+   "id": "banking77:90",
+   "pred": "exchange via app",
+   "proba": 0.063187375664711
+  },
+  {
+   "id": "banking77:91",
+   "pred": "balance not updated after cheque or cash deposit",
+   "proba": 0.051853347569704056
+  },
+  {
+   "id": "banking77:92",
+   "pred": "pending top up",
+   "proba": 0.14668676257133484
+  },
+  {
+   "id": "banking77:93",
+   "pred": "get physical card",
+   "proba": 0.19739429652690887
+  },
+  {
+   "id": "banking77:94",
+   "pred": "activate my card",
+   "proba": 0.2738666534423828
+  },
+  {
+   "id": "banking77:95",
+   "pred": "Refund not showing up",
+   "proba": 0.06879854947328568
+  },
+  {
+   "id": "banking77:96",
+   "pred": "extra charge on statement",
+   "proba": 0.07361399382352829
+  },
+  {
+   "id": "banking77:97",
+   "pred": "transfer fee charged",
+   "proba": 0.14027081429958344
+  },
+  {
+   "id": "banking77:98",
+   "pred": "card payment fee charged",
+   "proba": 0.13181672990322113
+  },
+  {
+   "id": "banking77:99",
+   "pred": "card payment fee charged",
+   "proba": 0.06916118413209915
+  }
+ ],
+ "peak_rss_gb": 2.669464111328125,
+ "peak_rss_latency_child_gb": 0.5085639953613281,
+ "baselines": {
+  "jev-latest": {
+   "n": 100,
+   "accuracy": 0.76,
+   "p50_latency_ms": 842.75,
+   "confident_share": 0.7,
+   "confident_accuracy": 0.8714285714285714
+  },
+  "gpt-5.4-mini": {
+   "n": 100,
+   "accuracy": 0.75,
+   "p50_latency_ms": 4394.200000000001,
+   "confident_share": 0.76,
+   "confident_accuracy": 0.8289473684210527
+  },
+  "gpt-5.6-luna": {
+   "n": 100,
+   "accuracy": 0.78,
+   "p50_latency_ms": 4901.0,
+   "confident_share": 0.82,
+   "confident_accuracy": 0.8048780487804879
+  }
+ },
+ "env": {
+  "cpu": "x86_64",
+  "native_bf16": false,
+  "threads": 4,
+  "torch": "2.14.1+cpu",
+  "ld_preload": "/usr/lib/x86_64-linux-gnu/libtcmalloc.so.4",
+  "args": {
+   "datasets": "banking77",
+   "shots": "0",
+   "seeds": "0",
+   "n_test": 100,
+   "model": "BAAI/bge-base-en-v1.5",
+   "max_length": 256,
+   "batch_size": 16,
+   "num_iterations": 20,
+   "max_steps": 600,
+   "zs_per_class": 8,
+   "latency": 50,
+   "latency_min_shots": 1,
+   "no_bf16": false,
+   "out": "out_probe_bge-base-en-v1.5"
+  }
+ }
+}

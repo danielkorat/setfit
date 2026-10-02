@@ -1,0 +1,580 @@
+{
+ "dataset": "enron_spam",
+ "shots": 8,
+ "seed": 0,
+ "bf16": false,
+ "n_train": 16,
+ "n_test": 100,
+ "accuracy": 0.94,
+ "confident_share": 0.0,
+ "confident_accuracy": null,
+ "train_seconds": 714.9226013839998,
+ "batched_infer_ms_per_item": 105.09430313999474,
+ "predictions": [
+  {
+   "id": "enron_spam:0",
+   "pred": "spam",
+   "proba": 0.7644840478897095
+  },
+  {
+   "id": "enron_spam:1",
+   "pred": "ham",
+   "proba": 0.7725831270217896
+  },
+  {
+   "id": "enron_spam:2",
+   "pred": "ham",
+   "proba": 0.7899075150489807
+  },
+  {
+   "id": "enron_spam:3",
+   "pred": "ham",
+   "proba": 0.7849082350730896
+  },
+  {
+   "id": "enron_spam:4",
+   "pred": "spam",
+   "proba": 0.5237131118774414
+  },
+  {
+   "id": "enron_spam:5",
+   "pred": "spam",
+   "proba": 0.7570821642875671
+  },
+  {
+   "id": "enron_spam:6",
+   "pred": "spam",
+   "proba": 0.6886601448059082
+  },
+  {
+   "id": "enron_spam:7",
+   "pred": "spam",
+   "proba": 0.6162254214286804
+  },
+  {
+   "id": "enron_spam:8",
+   "pred": "ham",
+   "proba": 0.7457342743873596
+  },
+  {
+   "id": "enron_spam:9",
+   "pred": "spam",
+   "proba": 0.7111083269119263
+  },
+  {
+   "id": "enron_spam:10",
+   "pred": "spam",
+   "proba": 0.6774262189865112
+  },
+  {
+   "id": "enron_spam:11",
+   "pred": "spam",
+   "proba": 0.757351815700531
+  },
+  {
+   "id": "enron_spam:12",
+   "pred": "spam",
+   "proba": 0.656601071357727
+  },
+  {
+   "id": "enron_spam:13",
+   "pred": "spam",
+   "proba": 0.7932206988334656
+  },
+  {
+   "id": "enron_spam:14",
+   "pred": "spam",
+   "proba": 0.7536138296127319
+  },
+  {
+   "id": "enron_spam:15",
+   "pred": "spam",
+   "proba": 0.7311343550682068
+  },
+  {
+   "id": "enron_spam:16",
+   "pred": "spam",
+   "proba": 0.6214457750320435
+  },
+  {
+   "id": "enron_spam:17",
+   "pred": "ham",
+   "proba": 0.7370260953903198
+  },
+  {
+   "id": "enron_spam:18",
+   "pred": "spam",
+   "proba": 0.7923824191093445
+  },
+  {
+   "id": "enron_spam:19",
+   "pred": "spam",
+   "proba": 0.6956197619438171
+  },
+  {
+   "id": "enron_spam:20",
+   "pred": "ham",
+   "proba": 0.6278948783874512
+  },
+  {
+   "id": "enron_spam:21",
+   "pred": "ham",
+   "proba": 0.5227741003036499
+  },
+  {
+   "id": "enron_spam:22",
+   "pred": "spam",
+   "proba": 0.7515107989311218
+  },
+  {
+   "id": "enron_spam:23",
+   "pred": "ham",
+   "proba": 0.803783655166626
+  },
+  {
+   "id": "enron_spam:24",
+   "pred": "spam",
+   "proba": 0.6779793500900269
+  },
+  {
+   "id": "enron_spam:25",
+   "pred": "spam",
+   "proba": 0.7890185117721558
+  },
+  {
+   "id": "enron_spam:26",
+   "pred": "ham",
+   "proba": 0.7165189981460571
+  },
+  {
+   "id": "enron_spam:27",
+   "pred": "ham",
+   "proba": 0.7363576889038086
+  },
+  {
+   "id": "enron_spam:28",
+   "pred": "spam",
+   "proba": 0.7987229824066162
+  },
+  {
+   "id": "enron_spam:29",
+   "pred": "ham",
+   "proba": 0.7743696570396423
+  },
+  {
+   "id": "enron_spam:30",
+   "pred": "ham",
+   "proba": 0.6272841095924377
+  },
+  {
+   "id": "enron_spam:31",
+   "pred": "ham",
+   "proba": 0.5788066387176514
+  },
+  {
+   "id": "enron_spam:32",
+   "pred": "spam",
+   "proba": 0.7545965313911438
+  },
+  {
+   "id": "enron_spam:33",
+   "pred": "ham",
+   "proba": 0.7858535647392273
+  },
+  {
+   "id": "enron_spam:34",
+   "pred": "spam",
+   "proba": 0.7799956798553467
+  },
+  {
+   "id": "enron_spam:35",
+   "pred": "ham",
+   "proba": 0.7729277610778809
+  },
+  {
+   "id": "enron_spam:36",
+   "pred": "spam",
+   "proba": 0.8060181140899658
+  },
+  {
+   "id": "enron_spam:37",
+   "pred": "ham",
+   "proba": 0.6341657638549805
+  },
+  {
+   "id": "enron_spam:38",
+   "pred": "spam",
+   "proba": 0.8089295625686646
+  },
+  {
+   "id": "enron_spam:39",
+   "pred": "spam",
+   "proba": 0.5843648910522461
+  },
+  {
+   "id": "enron_spam:40",
+   "pred": "ham",
+   "proba": 0.7739526629447937
+  },
+  {
+   "id": "enron_spam:41",
+   "pred": "spam",
+   "proba": 0.7496815919876099
+  },
+  {
+   "id": "enron_spam:42",
+   "pred": "spam",
+   "proba": 0.792984664440155
+  },
+  {
+   "id": "enron_spam:43",
+   "pred": "ham",
+   "proba": 0.6889206171035767
+  },
+  {
+   "id": "enron_spam:44",
+   "pred": "ham",
+   "proba": 0.7589167356491089
+  },
+  {
+   "id": "enron_spam:45",
+   "pred": "ham",
+   "proba": 0.7810275554656982
+  },
+  {
+   "id": "enron_spam:46",
+   "pred": "spam",
+   "proba": 0.6138562560081482
+  },
+  {
+   "id": "enron_spam:47",
+   "pred": "spam",
+   "proba": 0.7676448822021484
+  },
+  {
+   "id": "enron_spam:48",
+   "pred": "ham",
+   "proba": 0.6666896939277649
+  },
+  {
+   "id": "enron_spam:49",
+   "pred": "spam",
+   "proba": 0.5507556796073914
+  },
+  {
+   "id": "enron_spam:50",
+   "pred": "spam",
+   "proba": 0.5401884913444519
+  },
+  {
+   "id": "enron_spam:51",
+   "pred": "ham",
+   "proba": 0.7859296202659607
+  },
+  {
+   "id": "enron_spam:52",
+   "pred": "ham",
+   "proba": 0.7366968989372253
+  },
+  {
+   "id": "enron_spam:53",
+   "pred": "ham",
+   "proba": 0.5949622988700867
+  },
+  {
+   "id": "enron_spam:54",
+   "pred": "spam",
+   "proba": 0.7995853424072266
+  },
+  {
+   "id": "enron_spam:55",
+   "pred": "spam",
+   "proba": 0.7978319525718689
+  },
+  {
+   "id": "enron_spam:56",
+   "pred": "spam",
+   "proba": 0.5924890041351318
+  },
+  {
+   "id": "enron_spam:57",
+   "pred": "ham",
+   "proba": 0.7282374501228333
+  },
+  {
+   "id": "enron_spam:58",
+   "pred": "ham",
+   "proba": 0.5975288152694702
+  },
+  {
+   "id": "enron_spam:59",
+   "pred": "spam",
+   "proba": 0.776561975479126
+  },
+  {
+   "id": "enron_spam:60",
+   "pred": "spam",
+   "proba": 0.7795326113700867
+  },
+  {
+   "id": "enron_spam:61",
+   "pred": "spam",
+   "proba": 0.6658982634544373
+  },
+  {
+   "id": "enron_spam:62",
+   "pred": "spam",
+   "proba": 0.6386276483535767
+  },
+  {
+   "id": "enron_spam:63",
+   "pred": "ham",
+   "proba": 0.76911461353302
+  },
+  {
+   "id": "enron_spam:64",
+   "pred": "ham",
+   "proba": 0.6000692844390869
+  },
+  {
+   "id": "enron_spam:65",
+   "pred": "spam",
+   "proba": 0.7620331048965454
+  },
+  {
+   "id": "enron_spam:66",
+   "pred": "ham",
+   "proba": 0.6791762113571167
+  },
+  {
+   "id": "enron_spam:67",
+   "pred": "ham",
+   "proba": 0.5326648354530334
+  },
+  {
+   "id": "enron_spam:68",
+   "pred": "spam",
+   "proba": 0.7968758344650269
+  },
+  {
+   "id": "enron_spam:69",
+   "pred": "spam",
+   "proba": 0.7572550177574158
+  },
+  {
+   "id": "enron_spam:70",
+   "pred": "spam",
+   "proba": 0.8017635345458984
+  },
+  {
+   "id": "enron_spam:71",
+   "pred": "spam",
+   "proba": 0.7349139451980591
+  },
+  {
+   "id": "enron_spam:72",
+   "pred": "spam",
+   "proba": 0.8068522214889526
+  },
+  {
+   "id": "enron_spam:73",
+   "pred": "ham",
+   "proba": 0.7471499443054199
+  },
+  {
+   "id": "enron_spam:74",
+   "pred": "spam",
+   "proba": 0.785198986530304
+  },
+  {
+   "id": "enron_spam:75",
+   "pred": "spam",
+   "proba": 0.7661359906196594
+  },
+  {
+   "id": "enron_spam:76",
+   "pred": "spam",
+   "proba": 0.7258418798446655
+  },
+  {
+   "id": "enron_spam:77",
+   "pred": "ham",
+   "proba": 0.5099645853042603
+  },
+  {
+   "id": "enron_spam:78",
+   "pred": "spam",
+   "proba": 0.7948876023292542
+  },
+  {
+   "id": "enron_spam:79",
+   "pred": "ham",
+   "proba": 0.7645547389984131
+  },
+  {
+   "id": "enron_spam:80",
+   "pred": "ham",
+   "proba": 0.6982576847076416
+  },
+  {
+   "id": "enron_spam:81",
+   "pred": "ham",
+   "proba": 0.707169771194458
+  },
+  {
+   "id": "enron_spam:82",
+   "pred": "ham",
+   "proba": 0.7318136096000671
+  },
+  {
+   "id": "enron_spam:83",
+   "pred": "ham",
+   "proba": 0.7641206383705139
+  },
+  {
+   "id": "enron_spam:84",
+   "pred": "ham",
+   "proba": 0.7698315978050232
+  },
+  {
+   "id": "enron_spam:85",
+   "pred": "spam",
+   "proba": 0.7925413846969604
+  },
+  {
+   "id": "enron_spam:86",
+   "pred": "spam",
+   "proba": 0.5281161069869995
+  },
+  {
+   "id": "enron_spam:87",
+   "pred": "spam",
+   "proba": 0.757347583770752
+  },
+  {
+   "id": "enron_spam:88",
+   "pred": "ham",
+   "proba": 0.7922974824905396
+  },
+  {
+   "id": "enron_spam:89",
+   "pred": "spam",
+   "proba": 0.5787182450294495
+  },
+  {
+   "id": "enron_spam:90",
+   "pred": "ham",
+   "proba": 0.6269848942756653
+  },
+  {
+   "id": "enron_spam:91",
+   "pred": "spam",
+   "proba": 0.7903139591217041
+  },
+  {
+   "id": "enron_spam:92",
+   "pred": "spam",
+   "proba": 0.7618701457977295
+  },
+  {
+   "id": "enron_spam:93",
+   "pred": "ham",
+   "proba": 0.6844881772994995
+  },
+  {
+   "id": "enron_spam:94",
+   "pred": "spam",
+   "proba": 0.7269953489303589
+  },
+  {
+   "id": "enron_spam:95",
+   "pred": "ham",
+   "proba": 0.7497432231903076
+  },
+  {
+   "id": "enron_spam:96",
+   "pred": "spam",
+   "proba": 0.6980075836181641
+  },
+  {
+   "id": "enron_spam:97",
+   "pred": "ham",
+   "proba": 0.8118664622306824
+  },
+  {
+   "id": "enron_spam:98",
+   "pred": "spam",
+   "proba": 0.8021376729011536
+  },
+  {
+   "id": "enron_spam:99",
+   "pred": "spam",
+   "proba": 0.6579164266586304
+  }
+ ],
+ "latency_torch_fp32": {
+  "p50_ms": 397.4802560005628,
+  "p95_ms": 593.5591430006752,
+  "n": 50
+ },
+ "latency_openvino_fp32": {
+  "p50_ms": 273.35550550014887,
+  "p95_ms": 470.7853120016807,
+  "n": 50
+ },
+ "accuracy_openvino_fp32": 0.94,
+ "latency_openvino_int8": {
+  "p50_ms": 194.26592899981188,
+  "p95_ms": 321.5764040014619,
+  "n": 50
+ },
+ "accuracy_openvino_int8": 0.94,
+ "peak_rss_gb": 10.987945556640625,
+ "peak_rss_latency_child_gb": 10.987945556640625,
+ "baselines": {
+  "jev-latest": {
+   "n": 100,
+   "accuracy": 0.98,
+   "p50_latency_ms": 849.95,
+   "confident_share": 0.86,
+   "confident_accuracy": 1.0
+  },
+  "gpt-5.4-mini": {
+   "n": 100,
+   "accuracy": 0.99,
+   "p50_latency_ms": 1445.4499999999998,
+   "confident_share": 0.94,
+   "confident_accuracy": 1.0
+  },
+  "gpt-5.6-luna": {
+   "n": 100,
+   "accuracy": 0.99,
+   "p50_latency_ms": 1556.6999999999998,
+   "confident_share": 0.99,
+   "confident_accuracy": 0.98989898989899
+  }
+ },
+ "env": {
+  "cpu": "x86_64",
+  "native_bf16": false,
+  "threads": 4,
+  "torch": "2.14.1+cpu",
+  "ld_preload": "/usr/lib/x86_64-linux-gnu/libtcmalloc.so.4",
+  "args": {
+   "datasets": "enron_spam",
+   "shots": "8",
+   "seeds": "0",
+   "n_test": 100,
+   "model": "sentence-transformers/all-mpnet-base-v2",
+   "max_length": 256,
+   "batch_size": 16,
+   "num_iterations": 20,
+   "max_steps": 600,
+   "zs_per_class": 8,
+   "latency": 50,
+   "latency_min_shots": 1,
+   "no_bf16": false,
+   "out": "out_probe_all-mpnet-base-v2"
+  }
+ }
+}
