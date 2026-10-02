@@ -53,6 +53,9 @@ Recorded on a 4-core Xeon (AVX-512 + VNNI, no bf16/AMX) with 16 GB RAM, fp32.
 | sst2 | bge-small | 0 | 87 | 96 | 95 | 96 | 18 | – |
 | sst2 | bge-small | 8 | 89 | 96 | 95 | 96 | 27 | torch 64, OpenVINO 25, OpenVINO int8 17 |
 | sst2 | bge-base | 8 | 91 | 96 | 95 | 96 | 84 | torch 197, OpenVINO 66, OpenVINO int8 40 |
+| ag_news | bge-base | 8 | 87 | 90 | 89 | 89 | 614 | torch 224, OpenVINO 112, OpenVINO int8 69 |
+| enron_spam | bge-base | 8 | 87 | 98 | 99 | 99 | 740 | torch 382, OpenVINO 300, OpenVINO int8 197 |
+| banking77 | bge-base | 8 | **82** | 76 | 75 | 78 | 1419 | torch 123, OpenVINO 57, OpenVINO int8 27 |
 
 OpenVINO and OpenVINO int8 gave the same accuracy as PyTorch on every run. For comparison, Jev took 0.8–0.9 s per call
 in jev-eval, including the network round trip.
