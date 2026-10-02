@@ -60,6 +60,19 @@ Recorded on a 4-core Xeon (AVX-512 + VNNI, no bf16/AMX) with 16 GB RAM, fp32.
 | ag_news | all-mpnet-base | 8 | 88 | 90 | 89 | 89 | 320 | torch 232, OpenVINO 112, OpenVINO int8 62 |
 | enron_spam | all-mpnet-base | 8 | 94 | 98 | 99 | 99 | 715 | torch 397, OpenVINO 273, OpenVINO int8 194 |
 | banking77 | all-mpnet-base | 8 | **79** | 76 | 75 | 78 | 1409 | torch 108, OpenVINO 55, OpenVINO int8 25 |
+| sst2 | bge-base | 0 | 87 | 96 | 95 | 96 | 48 | – |
+| ag_news | bge-base | 0 | 77 | 90 | 89 | 89 | 96 | – |
+| enron_spam | bge-base | 0 | 50 | 98 | 99 | 99 | 58 | – |
+| banking77 | bge-base | 0 | 62 | 76 | 75 | 78 | 641 | – |
+| sst2 | all-mpnet-base | 0 | 81 | 96 | 95 | 96 | 45 | – |
+| ag_news | all-mpnet-base | 0 | 77 | 90 | 89 | 89 | 98 | – |
+| enron_spam | all-mpnet-base | 0 | 48 | 98 | 99 | 99 | 60 | – |
+| banking77 | all-mpnet-base | 0 | 57 | 76 | 75 | 78 | 635 | – |
+
+Zero-shot SetFit (templated examples from the label descriptions) trails Jev by 9–50 points with every body tried, and
+is at chance on Enron, where short templated sentences don't resemble the long test emails. With 8 labeled examples
+per class, all-mpnet-base is within 2–4 points of Jev on SST-2, AG News and Enron, and ahead of Jev and both GPT models
+on Banking77.
 
 OpenVINO matched PyTorch's accuracy on every run. OpenVINO int8 stayed within one point: bge-base Enron 86 vs 87, all-mpnet-base Banking77 78 vs 79, and all-mpnet-base SST-2 94 vs 93. For comparison, Jev took 0.8–0.9 s per call
 in jev-eval, including the network round trip.
