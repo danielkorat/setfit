@@ -42,7 +42,7 @@ process: OpenVINO's exporter crashes under tcmalloc, which `run.sh` preloads on 
 Recorded on a 4-core Xeon (AVX-512 + VNNI, no bf16/AMX) with 16 GB RAM, fp32.
 
 - `probe_bge-small_cpu` used batch size 32.
-- `probe_bge-base_cpu` used batch size 16. Its training times are inflated where another job shared the CPU.
+- `probe_bge-base_cpu` and `probe_mpnet-base_cpu` used batch size 16. Its training times are inflated where another job shared the CPU.
 - The bge-small Enron 8-shot result was lost to an out-of-memory kill.
 
 | dataset | body | shots/class | SetFit | Jev | gpt-5.4-mini | gpt-5.6-luna | train s | batch-1 p50 ms |
@@ -56,6 +56,10 @@ Recorded on a 4-core Xeon (AVX-512 + VNNI, no bf16/AMX) with 16 GB RAM, fp32.
 | ag_news | bge-base | 8 | 87 | 90 | 89 | 89 | 614 | torch 224, OpenVINO 112, OpenVINO int8 69 |
 | enron_spam | bge-base | 8 | 87 | 98 | 99 | 99 | 740 | torch 382, OpenVINO 300, OpenVINO int8 197 |
 | banking77 | bge-base | 8 | **82** | 76 | 75 | 78 | 1419 | torch 123, OpenVINO 57, OpenVINO int8 27 |
+| sst2 | all-mpnet-base | 8 | 93 | 96 | 95 | 96 | 74 | torch 194, OpenVINO 69, OpenVINO int8 36 |
+| ag_news | all-mpnet-base | 8 | 88 | 90 | 89 | 89 | 320 | torch 232, OpenVINO 112, OpenVINO int8 62 |
+| enron_spam | all-mpnet-base | 8 | 94 | 98 | 99 | 99 | 715 | torch 397, OpenVINO 273, OpenVINO int8 194 |
+| banking77 | all-mpnet-base | 8 | **79** | 76 | 75 | 78 | 1409 | torch 108, OpenVINO 55, OpenVINO int8 25 |
 
-OpenVINO matched PyTorch's accuracy on every run. OpenVINO int8 matched it too, except bge-base on Enron, where it scored 86 against 87. For comparison, Jev took 0.8–0.9 s per call
+OpenVINO matched PyTorch's accuracy on every run. OpenVINO int8 stayed within one point: bge-base Enron 86 vs 87, all-mpnet-base Banking77 78 vs 79, and all-mpnet-base SST-2 94 vs 93. For comparison, Jev took 0.8–0.9 s per call
 in jev-eval, including the network round trip.
