@@ -1,0 +1,578 @@
+{
+ "dataset": "ag_news",
+ "shots": 8,
+ "seed": 0,
+ "bf16": false,
+ "n_train": 32,
+ "n_test": 100,
+ "accuracy": 0.87,
+ "confident_share": 0.0,
+ "confident_accuracy": null,
+ "train_seconds": 145.30736104900006,
+ "batched_infer_ms_per_item": 19.70693429000221,
+ "predictions": [
+  {
+   "id": "ag_news:0",
+   "pred": "Sci/Tech",
+   "proba": 0.4311785101890564
+  },
+  {
+   "id": "ag_news:1",
+   "pred": "Sports",
+   "proba": 0.40853387117385864
+  },
+  {
+   "id": "ag_news:2",
+   "pred": "Business",
+   "proba": 0.3738209009170532
+  },
+  {
+   "id": "ag_news:3",
+   "pred": "Business",
+   "proba": 0.3747219443321228
+  },
+  {
+   "id": "ag_news:4",
+   "pred": "Sports",
+   "proba": 0.4109303951263428
+  },
+  {
+   "id": "ag_news:5",
+   "pred": "Business",
+   "proba": 0.3566398620605469
+  },
+  {
+   "id": "ag_news:6",
+   "pred": "Business",
+   "proba": 0.36575525999069214
+  },
+  {
+   "id": "ag_news:7",
+   "pred": "Sports",
+   "proba": 0.5616613030433655
+  },
+  {
+   "id": "ag_news:8",
+   "pred": "Sports",
+   "proba": 0.47568511962890625
+  },
+  {
+   "id": "ag_news:9",
+   "pred": "Sports",
+   "proba": 0.5415999293327332
+  },
+  {
+   "id": "ag_news:10",
+   "pred": "Business",
+   "proba": 0.4215705394744873
+  },
+  {
+   "id": "ag_news:11",
+   "pred": "Sports",
+   "proba": 0.4399089217185974
+  },
+  {
+   "id": "ag_news:12",
+   "pred": "Business",
+   "proba": 0.4011329114437103
+  },
+  {
+   "id": "ag_news:13",
+   "pred": "Business",
+   "proba": 0.3718123137950897
+  },
+  {
+   "id": "ag_news:14",
+   "pred": "World",
+   "proba": 0.4258636236190796
+  },
+  {
+   "id": "ag_news:15",
+   "pred": "Sci/Tech",
+   "proba": 0.38622385263442993
+  },
+  {
+   "id": "ag_news:16",
+   "pred": "Sports",
+   "proba": 0.478012353181839
+  },
+  {
+   "id": "ag_news:17",
+   "pred": "Sci/Tech",
+   "proba": 0.41001302003860474
+  },
+  {
+   "id": "ag_news:18",
+   "pred": "Business",
+   "proba": 0.33747461438179016
+  },
+  {
+   "id": "ag_news:19",
+   "pred": "World",
+   "proba": 0.29752400517463684
+  },
+  {
+   "id": "ag_news:20",
+   "pred": "World",
+   "proba": 0.507826030254364
+  },
+  {
+   "id": "ag_news:21",
+   "pred": "World",
+   "proba": 0.368191659450531
+  },
+  {
+   "id": "ag_news:22",
+   "pred": "Sci/Tech",
+   "proba": 0.30330440402030945
+  },
+  {
+   "id": "ag_news:23",
+   "pred": "Sci/Tech",
+   "proba": 0.318183034658432
+  },
+  {
+   "id": "ag_news:24",
+   "pred": "Business",
+   "proba": 0.38922521471977234
+  },
+  {
+   "id": "ag_news:25",
+   "pred": "World",
+   "proba": 0.3393973112106323
+  },
+  {
+   "id": "ag_news:26",
+   "pred": "World",
+   "proba": 0.3097189664840698
+  },
+  {
+   "id": "ag_news:27",
+   "pred": "World",
+   "proba": 0.4249189794063568
+  },
+  {
+   "id": "ag_news:28",
+   "pred": "Sports",
+   "proba": 0.3832095265388489
+  },
+  {
+   "id": "ag_news:29",
+   "pred": "Business",
+   "proba": 0.3485771417617798
+  },
+  {
+   "id": "ag_news:30",
+   "pred": "Business",
+   "proba": 0.3616319000720978
+  },
+  {
+   "id": "ag_news:31",
+   "pred": "World",
+   "proba": 0.41124340891838074
+  },
+  {
+   "id": "ag_news:32",
+   "pred": "World",
+   "proba": 0.3609265089035034
+  },
+  {
+   "id": "ag_news:33",
+   "pred": "Sports",
+   "proba": 0.39430364966392517
+  },
+  {
+   "id": "ag_news:34",
+   "pred": "World",
+   "proba": 0.36165302991867065
+  },
+  {
+   "id": "ag_news:35",
+   "pred": "Business",
+   "proba": 0.35353541374206543
+  },
+  {
+   "id": "ag_news:36",
+   "pred": "Business",
+   "proba": 0.38411110639572144
+  },
+  {
+   "id": "ag_news:37",
+   "pred": "World",
+   "proba": 0.4197617173194885
+  },
+  {
+   "id": "ag_news:38",
+   "pred": "Sci/Tech",
+   "proba": 0.3242037296295166
+  },
+  {
+   "id": "ag_news:39",
+   "pred": "Business",
+   "proba": 0.36189571022987366
+  },
+  {
+   "id": "ag_news:40",
+   "pred": "Sports",
+   "proba": 0.45643988251686096
+  },
+  {
+   "id": "ag_news:41",
+   "pred": "World",
+   "proba": 0.40061014890670776
+  },
+  {
+   "id": "ag_news:42",
+   "pred": "World",
+   "proba": 0.4724630117416382
+  },
+  {
+   "id": "ag_news:43",
+   "pred": "World",
+   "proba": 0.3216930627822876
+  },
+  {
+   "id": "ag_news:44",
+   "pred": "Business",
+   "proba": 0.35596922039985657
+  },
+  {
+   "id": "ag_news:45",
+   "pred": "World",
+   "proba": 0.2958599328994751
+  },
+  {
+   "id": "ag_news:46",
+   "pred": "Business",
+   "proba": 0.39353862404823303
+  },
+  {
+   "id": "ag_news:47",
+   "pred": "Business",
+   "proba": 0.32835090160369873
+  },
+  {
+   "id": "ag_news:48",
+   "pred": "Sports",
+   "proba": 0.3338667154312134
+  },
+  {
+   "id": "ag_news:49",
+   "pred": "Sports",
+   "proba": 0.3435664176940918
+  },
+  {
+   "id": "ag_news:50",
+   "pred": "Sports",
+   "proba": 0.47435280680656433
+  },
+  {
+   "id": "ag_news:51",
+   "pred": "Sports",
+   "proba": 0.5076256394386292
+  },
+  {
+   "id": "ag_news:52",
+   "pred": "Sci/Tech",
+   "proba": 0.2994237244129181
+  },
+  {
+   "id": "ag_news:53",
+   "pred": "World",
+   "proba": 0.48670095205307007
+  },
+  {
+   "id": "ag_news:54",
+   "pred": "World",
+   "proba": 0.3892693817615509
+  },
+  {
+   "id": "ag_news:55",
+   "pred": "World",
+   "proba": 0.42224857211112976
+  },
+  {
+   "id": "ag_news:56",
+   "pred": "Sports",
+   "proba": 0.5607863068580627
+  },
+  {
+   "id": "ag_news:57",
+   "pred": "Sci/Tech",
+   "proba": 0.36152946949005127
+  },
+  {
+   "id": "ag_news:58",
+   "pred": "World",
+   "proba": 0.36101630330085754
+  },
+  {
+   "id": "ag_news:59",
+   "pred": "Sci/Tech",
+   "proba": 0.37067487835884094
+  },
+  {
+   "id": "ag_news:60",
+   "pred": "World",
+   "proba": 0.28977036476135254
+  },
+  {
+   "id": "ag_news:61",
+   "pred": "World",
+   "proba": 0.41956230998039246
+  },
+  {
+   "id": "ag_news:62",
+   "pred": "Sports",
+   "proba": 0.5143229961395264
+  },
+  {
+   "id": "ag_news:63",
+   "pred": "Sports",
+   "proba": 0.4912532567977905
+  },
+  {
+   "id": "ag_news:64",
+   "pred": "Sci/Tech",
+   "proba": 0.3307683765888214
+  },
+  {
+   "id": "ag_news:65",
+   "pred": "Business",
+   "proba": 0.33198878169059753
+  },
+  {
+   "id": "ag_news:66",
+   "pred": "World",
+   "proba": 0.477280855178833
+  },
+  {
+   "id": "ag_news:67",
+   "pred": "Business",
+   "proba": 0.41458797454833984
+  },
+  {
+   "id": "ag_news:68",
+   "pred": "Sci/Tech",
+   "proba": 0.3820381164550781
+  },
+  {
+   "id": "ag_news:69",
+   "pred": "World",
+   "proba": 0.27534112334251404
+  },
+  {
+   "id": "ag_news:70",
+   "pred": "Sports",
+   "proba": 0.44259828329086304
+  },
+  {
+   "id": "ag_news:71",
+   "pred": "Sports",
+   "proba": 0.4251078963279724
+  },
+  {
+   "id": "ag_news:72",
+   "pred": "Business",
+   "proba": 0.4180651605129242
+  },
+  {
+   "id": "ag_news:73",
+   "pred": "Business",
+   "proba": 0.4004914164543152
+  },
+  {
+   "id": "ag_news:74",
+   "pred": "Sports",
+   "proba": 0.5821676850318909
+  },
+  {
+   "id": "ag_news:75",
+   "pred": "World",
+   "proba": 0.46024051308631897
+  },
+  {
+   "id": "ag_news:76",
+   "pred": "Sci/Tech",
+   "proba": 0.4395180344581604
+  },
+  {
+   "id": "ag_news:77",
+   "pred": "World",
+   "proba": 0.3902318775653839
+  },
+  {
+   "id": "ag_news:78",
+   "pred": "World",
+   "proba": 0.4077708125114441
+  },
+  {
+   "id": "ag_news:79",
+   "pred": "Sports",
+   "proba": 0.4387287497520447
+  },
+  {
+   "id": "ag_news:80",
+   "pred": "World",
+   "proba": 0.3723945915699005
+  },
+  {
+   "id": "ag_news:81",
+   "pred": "Sports",
+   "proba": 0.4010450541973114
+  },
+  {
+   "id": "ag_news:82",
+   "pred": "Business",
+   "proba": 0.37902820110321045
+  },
+  {
+   "id": "ag_news:83",
+   "pred": "World",
+   "proba": 0.4212415814399719
+  },
+  {
+   "id": "ag_news:84",
+   "pred": "Sci/Tech",
+   "proba": 0.3440368175506592
+  },
+  {
+   "id": "ag_news:85",
+   "pred": "Business",
+   "proba": 0.32421398162841797
+  },
+  {
+   "id": "ag_news:86",
+   "pred": "Sci/Tech",
+   "proba": 0.3182333707809448
+  },
+  {
+   "id": "ag_news:87",
+   "pred": "Sports",
+   "proba": 0.45732927322387695
+  },
+  {
+   "id": "ag_news:88",
+   "pred": "Sci/Tech",
+   "proba": 0.2712417542934418
+  },
+  {
+   "id": "ag_news:89",
+   "pred": "Sci/Tech",
+   "proba": 0.3993142545223236
+  },
+  {
+   "id": "ag_news:90",
+   "pred": "Sci/Tech",
+   "proba": 0.32301539182662964
+  },
+  {
+   "id": "ag_news:91",
+   "pred": "Sports",
+   "proba": 0.32111257314682007
+  },
+  {
+   "id": "ag_news:92",
+   "pred": "World",
+   "proba": 0.4632705748081207
+  },
+  {
+   "id": "ag_news:93",
+   "pred": "World",
+   "proba": 0.4729557931423187
+  },
+  {
+   "id": "ag_news:94",
+   "pred": "Sports",
+   "proba": 0.47204336524009705
+  },
+  {
+   "id": "ag_news:95",
+   "pred": "Business",
+   "proba": 0.360767662525177
+  },
+  {
+   "id": "ag_news:96",
+   "pred": "Business",
+   "proba": 0.39570584893226624
+  },
+  {
+   "id": "ag_news:97",
+   "pred": "Sports",
+   "proba": 0.4274945855140686
+  },
+  {
+   "id": "ag_news:98",
+   "pred": "World",
+   "proba": 0.3900572955608368
+  },
+  {
+   "id": "ag_news:99",
+   "pred": "Sports",
+   "proba": 0.5163898468017578
+  }
+ ],
+ "latency_torch_fp32": {
+  "p50_ms": 87.38164750002397,
+  "p95_ms": 141.9289660002505,
+  "n": 50
+ },
+ "latency_openvino_fp32": {
+  "p50_ms": 40.25277949995143,
+  "p95_ms": 59.174802000143245,
+  "n": 50
+ },
+ "accuracy_openvino_fp32": 0.87,
+ "latency_openvino_int8": {
+  "p50_ms": 28.401423500099554,
+  "p95_ms": 40.274038999996264,
+  "n": 50
+ },
+ "accuracy_openvino_int8": 0.87,
+ "baselines": {
+  "jev-latest": {
+   "n": 100,
+   "accuracy": 0.9,
+   "p50_latency_ms": 828.35,
+   "confident_share": 0.89,
+   "confident_accuracy": 0.9438202247191011
+  },
+  "gpt-5.4-mini": {
+   "n": 100,
+   "accuracy": 0.89,
+   "p50_latency_ms": 1495.05,
+   "confident_share": 0.9,
+   "confident_accuracy": 0.9111111111111111
+  },
+  "gpt-5.6-luna": {
+   "n": 100,
+   "accuracy": 0.89,
+   "p50_latency_ms": 1564.05,
+   "confident_share": 0.92,
+   "confident_accuracy": 0.9239130434782609
+  }
+ },
+ "env": {
+  "cpu": "x86_64",
+  "native_bf16": false,
+  "threads": 4,
+  "torch": "2.14.1+cpu",
+  "ld_preload": "/usr/lib/x86_64-linux-gnu/libtcmalloc.so.4",
+  "args": {
+   "datasets": "sst2,ag_news,enron_spam,banking77",
+   "shots": "0,8",
+   "seeds": "0",
+   "n_test": 100,
+   "model": "BAAI/bge-small-en-v1.5",
+   "max_length": 256,
+   "batch_size": 32,
+   "num_iterations": 20,
+   "max_steps": 300,
+   "zs_per_class": 8,
+   "latency": 50,
+   "latency_min_shots": 1,
+   "no_bf16": false,
+   "out": "out_probe"
+  }
+ }
+}
