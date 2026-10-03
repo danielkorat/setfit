@@ -101,6 +101,11 @@ def main():
             print(json.dumps({"model": m["name"], "error": traceback.format_exc()[-400:]}), file=sys.stderr, flush=True)
     out["wall_seconds"] = time.perf_counter() - t_start
     blob = base64.b64encode(gzip.compress(json.dumps(out).encode())).decode()
+    try:  # also on the VM's disk, so run_colab.py can fetch it after a lost connection (`colab download`)
+        with open("/content/RESULT.txt", "w") as fh:
+            fh.write(blob)
+    except OSError:  # local dry run: no /content
+        pass
     print("RESULT_BEGIN\n" + blob + "\nRESULT_END", flush=True)
 
 

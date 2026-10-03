@@ -53,8 +53,10 @@ Results: [RESULTS.md](RESULTS.md) (table, setup, seeds, Opus-vs-gold agreement, 
   55.3 / 68.2, so bf16 autocast hurts mpnet as training gets longer. A frozen body (head only) gives 59.4 / 69.6,
   as good as full training. bge-base fp32 vs bf16 is mixed (59.0 -> 60.9, 66.8 -> 59.0). Per-run numbers:
   `results/diag/mpnet_drop.json`. Next, per the rule: the gold pilot rerun in fp32.
-- **Colab runs need the Mac awake:** a lid-closed sleep on battery drops `colab run`'s connection and the local
-  process then waits forever (3 Oct 2026, two runs lost). Keep the lid open or the Mac on power.
+- **Colab runs survive the Mac sleeping (since 3 Oct 2026):** a lid-closed sleep used to drop `colab run`'s
+  connection and leave the local process waiting forever (two runs lost). `run_on_colab` now starts jobs with
+  `colab run --keep`, notices sleep (a wall-clock jump) or a lost connection, fetches the result file the job also
+  writes on the VM (`colab download`), and always stops the session. Tested by killing the local client mid-job.
 
 ## Method
 

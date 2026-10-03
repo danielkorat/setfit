@@ -20,8 +20,10 @@ import base64
 import gzip
 import json
 import random
+import re
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 from tasks import HERE, TASKS, Item, Task, input_text, load_pool, load_test
@@ -75,6 +77,79 @@ def build_job(seed: int, cfg: dict) -> tuple[dict, dict]:
     return dict(config=cfg | dict(seed=seed), tasks=tasks), meta
 
 
+RESULT_REMOTE = "/content/RESULT.txt"  # every job template writes its result blob here too
+CONNECTION_ERRORS = ("Connection was lost", "ReadTimeout", "ConnectionError", "timed out")
+
+
+def _unblob(text: str) -> dict:
+    return json.loads(gzip.decompress(base64.b64decode(text.strip())))
+
+
+def _colab(*args: str, timeout: int = 180) -> subprocess.CompletedProcess | None:
+    try:
+        return subprocess.run(["colab", *args], capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        return None
+
+
+def _run_detached(script: Path, session: str, gpu: str, env_args: list[str], cap_seconds: int, log: Path) -> tuple[dict | None, str]:
+    """One `colab run --keep` attempt that survives the Mac sleeping or the connection dropping.
+
+    The VM keeps executing when the local client goes away (tested 3 Oct 2026: client killed after 75 s, the script
+    still finished and its file was downloadable). So on sleep (a wall-clock jump), a lost connection or the time
+    limit, the client is dropped and the result file is fetched with `colab download` until it appears. The session is
+    always stopped at the end. Returns (result or None, "ok" | "script_error" | "no_session" | "timeout").
+    """
+    t0 = time.time()
+    out_path = log.with_suffix(".stdout")
+    with open(out_path, "w") as so, open(log, "w") as se:
+        proc = subprocess.Popen(["colab", "run", "--keep", "--session", session, "--gpu", gpu, "--timeout", "5400",
+                                 *env_args, str(script)], stdout=so, stderr=se, text=True)
+        detached, last = "", time.time()
+        while proc.poll() is None:
+            time.sleep(15)  # pauses while the Mac sleeps; the wall clock does not
+            now = time.time()
+            if now - last > 120:
+                detached = f"the Mac slept ({now - last:.0f} s gap)"
+            elif now - t0 > cap_seconds:
+                detached = f"time limit {cap_seconds} s"
+            if detached:
+                proc.kill()
+                proc.wait()
+                break
+            last = now
+    stdout, stderr = out_path.read_text(), log.read_text()
+    try:
+        if "RESULT_BEGIN" in stdout:
+            return _unblob(stdout.split("RESULT_BEGIN\n", 1)[1].split("\nRESULT_END", 1)[0]), "ok"
+        killed = proc.returncode is not None and proc.returncode < 0  # client ended by a signal, not by the script
+        if not detached and not killed and not any(e in stderr for e in CONNECTION_ERRORS):
+            print(f"{session}: script ended without a result:\n{(stdout + stderr)[-1500:]}", flush=True)
+            return None, "script_error"
+        why = detached or ("client killed" if killed else "connection lost")
+        print(f"{session}: {why}; fetching the result from the VM instead", flush=True)
+        local = log.with_suffix(".result")
+        while time.time() - t0 < cap_seconds:
+            d = _colab("download", "-s", session, RESULT_REMOTE, str(local))
+            if d is not None and d.returncode == 0 and local.exists():
+                return _unblob(local.read_text()), "ok"
+            st = _colab("status", "-s", session)
+            st_text = (st.stdout + st.stderr) if st is not None else ""
+            if "Status:" not in st_text:
+                print(f"{session}: no such session on the server", flush=True)
+                return None, "no_session"
+            if "BUSY" not in st_text:  # the script finished or died; one last look for the file
+                d = _colab("download", "-s", session, RESULT_REMOTE, str(local))
+                if d is not None and d.returncode == 0 and local.exists():
+                    return _unblob(local.read_text()), "ok"
+                print(f"{session}: VM idle without a result file:\n{st_text[-500:]}", flush=True)
+                return None, "script_error"
+            time.sleep(60)
+        return None, "timeout"
+    finally:
+        _colab("stop", "-s", session)  # --keep leaves the VM running (and billing) otherwise
+
+
 def run_on_colab(job: dict, seed: int, gpus: list[str], prefix: str, template: str = "colab_job.py",
                  cap_seconds: int = 5400 + 600, env: dict[str, str] | None = None) -> dict:
     payload = base64.b64encode(gzip.compress(json.dumps(job).encode())).decode()
@@ -82,24 +157,21 @@ def run_on_colab(job: dict, seed: int, gpus: list[str], prefix: str, template: s
     script = WORK / f"{prefix}colab_seed{seed}.py"
     script.write_text(src)
     print(f"payload {len(payload) / 1e6:.1f} MB", flush=True)
+    # env goes to the VM through `colab run --env`, never into the script file (Colab secrets are not readable
+    # from `colab run`: "Secrets can only be fetched when running from the Colab UI")
+    env_args = [a for k, v in (env or {}).items() for a in ("--env", f"{k}={v}")]
     for gpu in gpus:
-        print(f"colab run --gpu {gpu} ...", flush=True)
-        try:  # the CLI once hung after creating a session and never executed the script (3 Oct 2026): cap it
-            # env goes to the VM through `colab run --env`, never into the script file (Colab secrets are not
-            # readable from `colab run`: "Secrets can only be fetched when running from the Colab UI")
-            env_args = [a for k, v in (env or {}).items() for a in ("--env", f"{k}={v}")]
-            p = subprocess.run(["colab", "run", "--gpu", gpu, "--timeout", "5400", *env_args, str(script)],
-                               capture_output=True, text=True, timeout=cap_seconds)
-        except subprocess.TimeoutExpired as e:
-            print(f"{gpu}: colab run still running after {e.timeout:.0f} s, killed", flush=True)
-            subprocess.run(["colab", "sessions"])  # prunes the stale local session and lists what the server still holds
-            continue
-        (WORK / f"{prefix}colab_seed{seed}_{gpu}.log").write_text(p.stderr + "\n--- stdout ---\n" + p.stdout[:5000])
-        if "RESULT_BEGIN" in p.stdout:
-            blob = p.stdout.split("RESULT_BEGIN\n", 1)[1].split("\nRESULT_END", 1)[0]
-            return json.loads(gzip.decompress(base64.b64decode(blob)))
-        print(f"{gpu} failed (exit {p.returncode}):\n{p.stderr[-1500:]}", flush=True)
-        if "Traceback" in p.stdout + p.stderr:  # a script error, not a GPU-allocation failure: don't retry elsewhere
+        for attempt in (1, 2):  # a connection lost before the session exists gets one retry
+            session = re.sub(r"[^a-z0-9-]", "-", f"jev-{prefix.lower()}s{seed}-{int(time.time()) % 100000}").strip("-")
+            print(f"colab run --gpu {gpu} --keep --session {session} (attempt {attempt}) ...", flush=True)
+            out, status = _run_detached(script, session, gpu, env_args, cap_seconds,
+                                        WORK / f"{prefix}colab_seed{seed}_{gpu}.log")
+            if out is not None:
+                return out
+            print(f"{gpu}: {status}", flush=True)
+            if status != "no_session":
+                break
+        if status == "script_error":  # a bug in the job, not the GPU: don't retry elsewhere
             break
     sys.exit(f"seed {seed}: no result")
 
