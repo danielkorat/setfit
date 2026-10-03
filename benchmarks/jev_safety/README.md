@@ -31,6 +31,19 @@ Results: [RESULTS.md](RESULTS.md) (table, setup, seeds, Opus-vs-gold agreement, 
   seed 0, scored on a 1,000-item validation split from the train pool and on the test set. Go/no-go for stage 2
   (refining around the best setting): some setting reaches validation toxic-class F1 >= 70 (at 0.5 or at the
   validation-tuned threshold).
+  **Result: fails, stage 2 not run.** Best validation toxic F1 is 66.4 (`all-mpnet-base-v2`, gold 8 per class,
+  validation-tuned threshold; test 57.2); best test F1 at a validation-tuned threshold is 63.1 (`bge-base-en-v1.5`,
+  gold 32 per class). Every zero-shot setting stays at or below 39.1 on validation and 30.7 on test. Few-shot
+  rankings are decent (test AUROC 84-90) but at 0.5 the models flag too many prompts (13% of test prompts are toxic).
+  Per-run numbers: `results/search/tc_stage1.json`.
+  **The colleague's recipe** (`--stage moshe`: `BAAI/bge-base-en`, labels "neutral"/"toxic", 8 per label,
+  batch 16, `max_steps=30`, seeds 0-2) reaches accuracy 58.3-61.9 on all 5,082 rows of the 0124 train split
+  (always answering "not toxic" scores 92.4 there) and test toxic F1 27.6-28.9; with `bge-base-en-v1.5`, 77.0-79.5
+  and 31.8-32.2. His snippet scores `metric="accuracy"`, so 80.6 is most likely accuracy, not the chart's F1.
+  Differences from his run: bf16 autocast here, setfit at `a000da0`, and his evaluation split is not in the snippet.
+  Per-run numbers: `results/search/tc_stagemoshe.json`.
+- **Colab runs need the Mac awake:** a lid-closed sleep on battery drops `colab run`'s connection and the local
+  process then waits forever (3 Oct 2026, two runs lost). Keep the lid open or the Mac on power.
 
 ## Method
 
