@@ -56,6 +56,14 @@ Results: [RESULTS.md](RESULTS.md) (table, setup, seeds, Opus-vs-gold agreement, 
   **fp32 pilot result: still fails.** Best is `all-mpnet-base-v2` with 64 per class, average F1 73.1 (bf16: 56.1); at
   32 per class mpnet gets 69.5 (bf16: 53.1). bge-base does not gain from fp32 (65.8 vs 67.5 at 32 per class). Table:
   [RESULTS.md](RESULTS.md) → Gold-label pilot. Next: [IMPROVEMENT_PLAN.md](IMPROVEMENT_PLAN.md).
+- **Embedder screen (IMPROVEMENT_PLAN.md step 1, 3 Oct 2026):** frozen embeddings + logistic regression, gold
+  labels, 5 seeds, average F1 at 8 / 16 / 32 per class. Best: `Qwen3-Embedding-0.6B` with a task instruction,
+  64.2 / 66.0 / 68.0 (all-mpnet-base-v2: 58.2 / 62.0 / 65.6). gte-large-en-v1.5, nomic-embed-text-v1.5,
+  bge-large/base, gte-modernbert-base and jina-embeddings-v3 land at 63.7-66.7 at 32 per class, so MTEB's toxicity
+  ranking did not carry over. Both step-1 gates fail (+5 over mpnet at 32 per class; 69.5 at 16). A threshold chosen
+  from the k labels (step 2) fails its rule too (it hurts Qwen3, ToxicChat -11 at 8 per class). `embeddinggemma-300m`
+  did not run: the VM went idle without a result, cause not found (`colab run --env` was ruled out).
+  Per-run numbers: `results/screen/embed_*.json`.
 - **Colab runs survive the Mac sleeping (since 3 Oct 2026):** a lid-closed sleep used to drop `colab run`'s
   connection and leave the local process waiting forever (two runs lost). `run_on_colab` now starts jobs with
   `colab run --keep`, notices sleep (a wall-clock jump) or a lost connection, fetches the result file the job also

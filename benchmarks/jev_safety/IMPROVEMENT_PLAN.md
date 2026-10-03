@@ -57,3 +57,13 @@ per-task hyperparameter search on a tiny validation set (Perez et al.: such sele
 - Licenses matter for a business: `jina-embeddings-v3` / v5 are non-commercial (CC BY-NC), so they are left out of
   step 1 unless used only as a reference; `embeddinggemma-300m` is gated on Hugging Face (needs the license accepted
   and a token on the Colab VM).
+
+## Results so far
+
+- **Step 1 (embedder screen): fails both gates.** Best frozen model `Qwen3-Embedding-0.6B` (task instruction):
+  64.2 / 66.0 / 68.0 average F1 at 8 / 16 / 32 per class, vs mpnet 58.2 / 62.0 / 65.6. Evidence 3 did not hold:
+  `jina-embeddings-v3` and `gte-modernbert-base`, the MTEB toxicity leaders, score 65.1 and 64.9 at 32 per class.
+  `embeddinggemma-300m` not run (job died on the VM, cause unknown). `results/screen/embed_*.json`.
+- **Step 2 (threshold from the k labels): fails its rule.** +0.7 to +3.3 average for most models, but some task
+  drops more than 2 points in most settings, and it hurts Qwen3 (ToxicChat -11.1 at 8 per class).
+- Steps 3-5 not run.
