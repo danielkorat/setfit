@@ -76,7 +76,7 @@ def build_job(seed: int, cfg: dict) -> tuple[dict, dict]:
 
 
 def run_on_colab(job: dict, seed: int, gpus: list[str], prefix: str, template: str = "colab_job.py",
-                 cap_seconds: int = 5400 + 600) -> dict:
+                 cap_seconds: int = 5400 + 600, env: dict[str, str] | None = None) -> dict:
     payload = base64.b64encode(gzip.compress(json.dumps(job).encode())).decode()
     src = (HERE / template).read_text().replace("__PAYLOAD__", payload).replace("__SETFIT_REF__", SETFIT_REF)
     script = WORK / f"{prefix}colab_seed{seed}.py"
@@ -85,7 +85,10 @@ def run_on_colab(job: dict, seed: int, gpus: list[str], prefix: str, template: s
     for gpu in gpus:
         print(f"colab run --gpu {gpu} ...", flush=True)
         try:  # the CLI once hung after creating a session and never executed the script (3 Oct 2026): cap it
-            p = subprocess.run(["colab", "run", "--gpu", gpu, "--timeout", "5400", str(script)],
+            # env goes to the VM through `colab run --env`, never into the script file (Colab secrets are not
+            # readable from `colab run`: "Secrets can only be fetched when running from the Colab UI")
+            env_args = [a for k, v in (env or {}).items() for a in ("--env", f"{k}={v}")]
+            p = subprocess.run(["colab", "run", "--gpu", gpu, "--timeout", "5400", *env_args, str(script)],
                                capture_output=True, text=True, timeout=cap_seconds)
         except subprocess.TimeoutExpired as e:
             print(f"{gpu}: colab run still running after {e.timeout:.0f} s, killed", flush=True)
