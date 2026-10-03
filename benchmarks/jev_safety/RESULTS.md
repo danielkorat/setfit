@@ -51,6 +51,23 @@ Computed after selection; gold labels were never used to select training example
 
 Refused = blocked under the usage policy even when the batch was split down to that single item (mostly chemical/biological HarmBench generations); such items are never used for training but stay in scoring.
 
+## Gold-label pilot (human labels; not the 0-label column)
+
+Same pools, test sets, hyperparameters and scoring as above, but the training examples are picked by their gold label instead of Opus's (pool shuffled with Random(seed), first k of each class, so the 8 are a subset of the 32, and the 32 of the 64). Purpose: check whether SetFit reaches the published range at all with clean labels. F1 (%), mean ± sample std over the listed seeds.
+
+| Model | per class | seeds | WildGuardTest prompt | Aegis v2 prompt | ToxicChat prompt | HarmBench response | Aegis v2 response | Average |
+|---|---|---|---|---|---|---|---|---|
+| `bge-base-en-v1.5` | 8 | 0 | 59.9 | 75.5 | 48.7 | 55.5 | 53.0 | 58.5 |
+| `bge-base-en-v1.5` | 32 | 0 | 66.8 | 75.8 | 59.0 | 67.7 | 68.0 | 67.5 |
+| `bge-base-en-v1.5` | 64 | 0 | 68.8 | 77.9 | 55.9 | 74.7 | 71.6 | **69.8** |
+| `all-mpnet-base-v2` | 8 | 0 | 63.9 | 73.5 | 45.6 | 61.7 | 55.1 | 60.0 |
+| `all-mpnet-base-v2` | 32 | 0 | 60.3 | 72.3 | 31.7 | 52.4 | 48.5 | 53.1 |
+| `all-mpnet-base-v2` | 64 | 0 | 58.4 | 68.4 | 29.2 | 61.1 | 63.2 | 56.1 |
+
+HarmBench response excludes each run's training items from scoring (2 x per class), so its n is 580, 532, 468 across rows.
+
+Go/no-go (written before the pilot ran): continue only if some setting reaches seed-0 average F1 >= 75. Best seed-0 setting: `bge-base-en-v1.5` with 64 per class, 69.8, so the pilot fails.
+
 ## Caveats
 
 - These public datasets (WildGuardMix, Aegis 2.0, ToxicChat, HarmBench) predate the training cutoffs of both Opus and Jev, so either may have seen them during training; the comparison does not control for contamination.

@@ -4,6 +4,7 @@
 
 Published columns are parsed from upstream report/EVALUATION_REPORT.md ("Accuracy results" table).
 SetFit = mean ± sample std over seeds of jsb F1 at threshold 0.5.
+Gold-label runs (results/gold/<model>_k<shots>/seed*.json) get their own RESULTS.md section, never the chart.
 """
 
 from __future__ import annotations
@@ -28,6 +29,7 @@ ROWS = [
 MODELS = ["Jev", "Shieldstral-1.0-3B", "Qwen3Guard-8B", "GPT-OSS-Safeguard-20B", "Nemotron-3.5-Safety-4B"]
 REPORT_COLS = ["Jev F1", "Shieldstral announced", "Qwen3Guard-8B", "GPT-OSS-Safeguard-20B", "Nemotron-3.5-Safety-4B"]
 SETFIT = "SetFit (0 human labels)"
+GO_F1 = 75.0  # gold-pilot go/no-go: some setting's seed-0 average F1 over the five tasks (README.md -> Status)
 
 
 def published() -> dict[str, list[float]]:
@@ -48,9 +50,44 @@ def published() -> dict[str, list[float]]:
     return out
 
 
-def load_seeds() -> list[dict]:
-    seeds = sorted(RESULTS.glob("seed*.json"), key=lambda p: int(p.stem[4:]))
+def load_seeds(d: Path = RESULTS) -> list[dict]:
+    seeds = sorted(d.glob("seed*.json"), key=lambda p: int(p.stem[4:]))
     return [json.loads(p.read_text()) for p in seeds]
+
+
+def gold_section() -> list[str]:
+    """RESULTS.md lines for the gold-label runs: one row per (model, shots), F1 mean ± std over its seeds."""
+    runs = []
+    for d in (RESULTS / "gold").glob("*_k*"):
+        seeds = load_seeds(d)
+        if seeds:
+            cfg = seeds[0]["config"]
+            runs.append((cfg["model"], cfg["per_class"], seeds, summarize(seeds)))
+    if not runs:
+        return []
+    runs.sort(key=lambda r: (r[0], r[1]))
+    seed0 = {(m, k): 100 * statistics.mean(next(r for r in seeds if r["seed"] == 0)["tasks"][tid]["f1"] for tid, *_ in ROWS)
+             for m, k, seeds, _ in runs if any(r["seed"] == 0 for r in seeds)}
+    best = max(seed0, key=seed0.get)
+    hdr = ["Model", "per class", "seeds"] + [label for _, _, label, *_ in ROWS] + ["Average"]
+    lines = ["## Gold-label pilot (human labels; not the 0-label column)", "",
+             "Same pools, test sets, hyperparameters and scoring as above, but the training examples are picked by their "
+             "gold label instead of Opus's (pool shuffled with Random(seed), first k of each class, so the 8 are a subset of "
+             "the 32, and the 32 of the 64). Purpose: check whether SetFit reaches the published range at all with clean labels. "
+             "F1 (%), mean ± sample std over the listed seeds.", "",
+             "| " + " | ".join(hdr) + " |", "|" + "---|" * len(hdr)]
+    for m, k, seeds, s in runs:
+        cell = (lambda v: f"{v['mean']:.1f} ± {v['std']:.1f}") if len(seeds) > 1 else (lambda v: f"{v['mean']:.1f}")
+        avg = cell(s["avg"])
+        lines.append(f"| `{m.split('/')[-1]}` | {k} | {', '.join(str(r['seed']) for r in seeds)} | "
+                     + " | ".join(cell(s[tid]) for tid, *_ in ROWS) + f" | {'**' + avg + '**' if (m, k) == best else avg} |")
+    hb = sorted({n for _, _, _, s in runs for n in s["hb_harmful_response"]["n"]}, reverse=True)
+    verdict = "passes" if seed0[best] >= GO_F1 else "fails"
+    lines += ["", f"HarmBench response excludes each run's training items from scoring (2 x per class), so its n is "
+              f"{', '.join(map(str, hb))} across rows.", "",
+              f"Go/no-go (written before the pilot ran): continue only if some setting reaches seed-0 average F1 >= {GO_F1:.0f}. "
+              f"Best seed-0 setting: `{best[0].split('/')[-1]}` with {best[1]} per class, {seed0[best]:.1f}, so the pilot {verdict}.", ""]
+    return lines
 
 
 def mean_std(xs: list[float]) -> tuple[float, float]:
@@ -150,6 +187,7 @@ def write_markdown(pub: dict, s: dict, seeds: list[dict]) -> str:
               "Refused = blocked under the usage policy even when the batch was split down to that single item "
               "(mostly chemical/biological HarmBench generations); such items are never used for training but stay in scoring.",
               "",
+              *gold_section(),
               "## Caveats",
               "",
               "- These public datasets (WildGuardMix, Aegis 2.0, ToxicChat, HarmBench) predate the training cutoffs of both Opus and Jev, "

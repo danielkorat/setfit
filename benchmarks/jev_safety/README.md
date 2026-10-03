@@ -18,6 +18,19 @@ Results: [RESULTS.md](RESULTS.md) (table, setup, seeds, Opus-vs-gold agreement, 
   by safeguards bill like successful ones. The labeling loop (165 calls, 53 refused) emptied three Pro 5-hour windows.
   Before relabeling, cut per-call overhead (one call per 64 items, no CLAUDE.md/memory loading) and drop retries on
   refusals.
+- **Gold-label pilot (3 Oct 2026, written before the pilot ran):** to check whether SetFit can reach the published
+  range at all before spending more on labeling, train on gold labels (no `claude -p` calls), seed 0, 8/32/64 examples
+  per class, `all-mpnet-base-v2` and `BAAI/bge-base-en-v1.5` (`run_colab.py --labels gold --model ... --shots ...`).
+  Go/no-go: continue only if some setting reaches average F1 >= 75 over the five tasks; if so, run seeds 0-2 for the
+  best setting. These runs use human labels and are reported apart from the "0 human labels" column.
+  **Result: fails.** Best is `bge-base-en-v1.5` with 64 per class, average F1 69.8; mpnet gets worse with more
+  examples (60.0 / 53.1 / 56.1 at 8 / 32 / 64). Table: [RESULTS.md](RESULTS.md) → Gold-label pilot. Seeds 1-2 not run.
+- **ToxicChat search (3 Oct 2026, written before stage 1 ran):** a colleague reports 80.6 on ToxicChat with SetFit's
+  zero-shot recipe (`get_templated_dataset`); which metric that is (toxic-class F1, macro F1 or accuracy) is being
+  asked. `search_tc.py` stage 1: 5 models x {3 zero-shot label pairs, gold 8 and 32 per class, gold 8 + zero-shot},
+  seed 0, scored on a 1,000-item validation split from the train pool and on the test set. Go/no-go for stage 2
+  (refining around the best setting): some setting reaches validation toxic-class F1 >= 70 (at 0.5 or at the
+  validation-tuned threshold).
 
 ## Method
 
