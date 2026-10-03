@@ -8,6 +8,7 @@ Returns metrics only (plus P(positive) for one check run). Prints gzip+base64 JS
 import base64
 import gzip
 import json
+import os
 import subprocess
 import sys
 import time
@@ -37,27 +38,21 @@ def scores(y, p, rate):
                 auprc=float(average_precision_score(y, p)), auroc=float(roc_auc_score(y, p)))
 
 
-def main():
-    t_start = time.perf_counter()
-    job = json.loads(gzip.decompress(base64.b64decode(PAYLOAD)))
-    # remote-code models (gte-large-en-v1.5, jina-embeddings-v3) break on transformers 5; such jobs pin older versions
-    subprocess.run([sys.executable, "-m", "pip", "install", "-q", *job.get("pip", ["-U", "sentence-transformers", "einops"])],
-                   check=True)
+def screen_models(job: dict, models: list[dict]) -> tuple[dict, dict]:
+    """Embed every text with each model and score the logistic-regression heads. Returns (library versions, results)."""
     import numpy as np
     import sentence_transformers
     import torch
+    import transformers
     from sentence_transformers import SentenceTransformer
     from sklearn.linear_model import LogisticRegression
     from sklearn.model_selection import StratifiedKFold, cross_val_predict
 
-    import transformers
-
-    env = dict(transformers=transformers.__version__, gpu=torch.cuda.get_device_name(0), torch=torch.__version__, sentence_transformers=sentence_transformers.__version__,
-               python=sys.version.split()[0], install_seconds=time.perf_counter() - t_start)
-    print(json.dumps(env), file=sys.stderr, flush=True)
-    out = dict(env=env, models={})
-    for m in job["models"]:
-        res = out["models"][m["name"]] = dict(runs={})
+    versions = dict(transformers=transformers.__version__, sentence_transformers=sentence_transformers.__version__,
+                    torch=torch.__version__, gpu=torch.cuda.get_device_name(0))
+    out = {}
+    for m in models:
+        res = out[m["name"]] = dict(runs={})
         try:
             t0 = time.perf_counter()
             model = SentenceTransformer(m["id"], device="cuda", trust_remote_code=m.get("trust_remote_code", False))
@@ -103,6 +98,49 @@ def main():
         except Exception:  # a model that fails to load (gated, remote code) must not lose the others
             res["error"] = traceback.format_exc()[-2000:]
             print(json.dumps({"model": m["name"], "error": traceback.format_exc()[-400:]}), file=sys.stderr, flush=True)
+    return versions, out
+
+
+WORKER_DIR = "/content/worker"
+
+
+def main():
+    if os.environ.get("EMBED_WORKER"):  # a subprocess started below: one model, older libraries on PYTHONPATH
+        job = json.load(open(f"{WORKER_DIR}/job.json"))
+        i = int(os.environ["EMBED_WORKER"])
+        versions, res = screen_models(job, [job["models"][i]])
+        json.dump(dict(versions=versions, models=res), open(f"{WORKER_DIR}/out_{i}.json", "w"))
+        return
+    t_start = time.perf_counter()
+    job = json.loads(gzip.decompress(base64.b64decode(PAYLOAD)))
+    if not job.get("isolate"):
+        subprocess.run([sys.executable, "-m", "pip", "install", "-q", *job.get("pip", ["-U", "sentence-transformers", "einops"])],
+                       check=True)
+        versions, models = screen_models(job, job["models"])
+    else:
+        # Remote-code models (gte-large-en-v1.5, jina-embeddings-v3) break on transformers 5, and downgrading inside
+        # the Colab kernel killed it (3 Oct 2026). So older libraries go to a side directory (no dependencies pulled,
+        # torch stays the VM's), and each model runs in its own process, which also contains a CUDA device-side error.
+        os.makedirs(WORKER_DIR, exist_ok=True)
+        pkgs = f"{WORKER_DIR}/pkgs"
+        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "--no-deps", "--target", pkgs, *job["pip"]], check=True)
+        src = job.pop("self_src")
+        json.dump(job, open(f"{WORKER_DIR}/job.json", "w"))
+        open(f"{WORKER_DIR}/worker.py", "w").write(src)
+        versions, models = {}, {}
+        for i, m in enumerate(job["models"]):
+            env = dict(os.environ, EMBED_WORKER=str(i), PYTHONPATH=pkgs + os.pathsep + os.environ.get("PYTHONPATH", ""))
+            p = subprocess.run([sys.executable, f"{WORKER_DIR}/worker.py"], env=env, capture_output=True, text=True)
+            try:
+                w = json.load(open(f"{WORKER_DIR}/out_{i}.json"))
+                versions = w["versions"]
+                models.update(w["models"])
+            except (OSError, ValueError):
+                models[m["name"]] = dict(runs={}, error=f"worker exit {p.returncode}:\n{p.stderr[-2000:]}")
+            print(json.dumps({"model": m["name"], "worker_exit": p.returncode}), file=sys.stderr, flush=True)
+    env = dict(versions, python=sys.version.split()[0], pip=job.get("pip"), isolate=bool(job.get("isolate")),
+               setup_and_run_seconds=time.perf_counter() - t_start)
+    out = dict(env=env, models=models)
     out["wall_seconds"] = time.perf_counter() - t_start
     blob = base64.b64encode(gzip.compress(json.dumps(out).encode())).decode()
     try:  # also on the VM's disk, so run_colab.py can fetch it after a lost connection (`colab download`)

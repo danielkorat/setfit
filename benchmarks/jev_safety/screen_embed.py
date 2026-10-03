@@ -90,11 +90,16 @@ def main():
     ap.add_argument("--models", help="comma-separated model names to run (default: all)")
     ap.add_argument("--tag", default="step1", help="output name: results/screen/embed_<tag>.json")
     ap.add_argument("--pip", help="pip install arguments on the VM, e.g. 'sentence-transformers<6 transformers<5 einops'")
+    ap.add_argument("--isolate", action="store_true",
+                    help="install --pip into a side directory and run each model in its own process (older libraries)")
     a = ap.parse_args()
     models = [m for m in MODELS if not a.models or m["name"] in a.models.split(",")]
     job, tests = build(models)
     if a.pip:
         job["pip"] = a.pip.split()
+    if a.isolate:
+        assert a.pip, "--isolate needs --pip (the packages to put in the side directory)"
+        job.update(isolate=True, self_src=(HERE / "colab_embed_job.py").read_text())
     n_texts = sum(len(t["texts"]) for t in job["tasks"].values())
     print(f"{len(models)} models, {n_texts} texts to embed per model, {len(SEEDS)} seeds x {PER_CLASS} per class")
     if a.dry:
