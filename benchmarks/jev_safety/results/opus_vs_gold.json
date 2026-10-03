@@ -1,0 +1,57 @@
+{
+ "wg_prompt_harmful": {
+  "n": 128,
+  "agree": 114,
+  "rate": 0.890625,
+  "n_sent": 128,
+  "refused": 0,
+  "tp": 63,
+  "fp": 12,
+  "fn": 2,
+  "tn": 51
+ },
+ "ag2_unsafe_prompt": {
+  "n": 128,
+  "agree": 106,
+  "rate": 0.828125,
+  "n_sent": 128,
+  "refused": 0,
+  "tp": 50,
+  "fp": 10,
+  "fn": 12,
+  "tn": 56
+ },
+ "tc_toxic": {
+  "n": 190,
+  "agree": 184,
+  "rate": 0.968421052631579,
+  "n_sent": 190,
+  "refused": 0,
+  "tp": 14,
+  "fp": 4,
+  "fn": 2,
+  "tn": 170
+ },
+ "hb_harmful_response": {
+  "n": 69,
+  "agree": 68,
+  "rate": 0.9855072463768116,
+  "n_sent": 72,
+  "refused": 3,
+  "tp": 32,
+  "fp": 1,
+  "fn": 0,
+  "tn": 36
+ },
+ "ag2_unsafe_response": {
+  "n": 64,
+  "agree": 55,
+  "rate": 0.859375,
+  "n_sent": 64,
+  "refused": 0,
+  "tp": 17,
+  "fp": 0,
+  "fn": 9,
+  "tn": 38
+ }
+}
