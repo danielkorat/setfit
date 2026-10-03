@@ -75,7 +75,8 @@ def build_job(seed: int, cfg: dict) -> tuple[dict, dict]:
     return dict(config=cfg | dict(seed=seed), tasks=tasks), meta
 
 
-def run_on_colab(job: dict, seed: int, gpus: list[str], prefix: str, template: str = "colab_job.py") -> dict:
+def run_on_colab(job: dict, seed: int, gpus: list[str], prefix: str, template: str = "colab_job.py",
+                 cap_seconds: int = 5400 + 600) -> dict:
     payload = base64.b64encode(gzip.compress(json.dumps(job).encode())).decode()
     src = (HERE / template).read_text().replace("__PAYLOAD__", payload).replace("__SETFIT_REF__", SETFIT_REF)
     script = WORK / f"{prefix}colab_seed{seed}.py"
@@ -83,8 +84,13 @@ def run_on_colab(job: dict, seed: int, gpus: list[str], prefix: str, template: s
     print(f"payload {len(payload) / 1e6:.1f} MB", flush=True)
     for gpu in gpus:
         print(f"colab run --gpu {gpu} ...", flush=True)
-        p = subprocess.run(["colab", "run", "--gpu", gpu, "--timeout", "5400", str(script)],
-                           capture_output=True, text=True)
+        try:  # the CLI once hung after creating a session and never executed the script (3 Oct 2026): cap it
+            p = subprocess.run(["colab", "run", "--gpu", gpu, "--timeout", "5400", str(script)],
+                               capture_output=True, text=True, timeout=cap_seconds)
+        except subprocess.TimeoutExpired as e:
+            print(f"{gpu}: colab run still running after {e.timeout:.0f} s, killed", flush=True)
+            subprocess.run(["colab", "sessions"])  # prunes the stale local session and lists what the server still holds
+            continue
         (WORK / f"{prefix}colab_seed{seed}_{gpu}.log").write_text(p.stderr + "\n--- stdout ---\n" + p.stdout[:5000])
         if "RESULT_BEGIN" in p.stdout:
             blob = p.stdout.split("RESULT_BEGIN\n", 1)[1].split("\nRESULT_END", 1)[0]

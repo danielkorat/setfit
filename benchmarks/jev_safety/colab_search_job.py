@@ -41,7 +41,8 @@ def main():
         try:
             train = Dataset.from_dict({"text": [x["text"] for x in run["train"]], "label": [int(x["label"]) for x in run["train"]]})
             model = SetFitModel.from_pretrained(run["model"], device=device)
-            model.model_body.max_seq_length = run["max_length"]
+            if run["max_length"]:  # None = keep the model's own max_seq_length
+                model.model_body.max_seq_length = run["max_length"]
             args = TrainingArguments(**run["args"], max_length=run["max_length"], seed=run["seed"], report_to="none",
                                      show_progress_bar=False, logging_steps=10_000, save_strategy="no",
                                      use_amp=precision == "fp16")

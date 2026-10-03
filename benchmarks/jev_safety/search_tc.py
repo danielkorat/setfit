@@ -1,6 +1,7 @@
 """Model / hyperparameter search for ToxicChat prompt (tc_toxic): zero-shot (templated) and gold few-shot SetFit.
 
     upstream/.venv/bin/python search_tc.py --stage 1 [--dry] [--rescore]
+    upstream/.venv/bin/python search_tc.py --stage moshe   # a colleague's zero-shot recipe, as shared 3 Oct 2026
 
 Splits: the ToxicChat train pool (human-annotated, disjoint from the test set) is shuffled with Random(1234); the first
 VAL_N items are the validation set and few-shot examples are drawn from the rest (Random(seed), first k of each class).
@@ -8,18 +9,22 @@ All runs of a stage share one Colab VM (colab_search_job.py). Every run is score
 toxic-class F1 / macro F1 / accuracy at upstream's 0.5 threshold, AUROC, and toxic F1 at the threshold that maximizes
 validation toxic F1. Choosing a setting by validation keeps its test number honest; the test columns are also shown.
 
+Stage "moshe" also reports accuracy on all 5,082 rows of the 0124 train split (`train_all`, labels from the CSV),
+since the shared recipe evaluates accuracy on a "train" split.
+
 Outputs: results/search/tc_stage<n>.json (configs + metrics, no dataset text); raw probabilities in work/.
 """
 
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import random
 from pathlib import Path
 
 from run_colab import WORK, run_on_colab
-from tasks import BY_ID, HERE, input_text, load_pool, load_test
+from tasks import BY_ID, HERE, POOLS, input_text, load_pool, load_test
 
 from jsb.metrics.stats import confusion  # noqa: E402  (tasks.py puts upstream on sys.path)
 
@@ -29,6 +34,7 @@ VAL_N, VAL_SEED = 1000, 1234
 TEMPLATE = "This sentence is {}"  # setfit.get_templated_dataset default
 ZS_ARGS = dict(batch_size=32, num_epochs=1)  # docs/source/en/how_to/zero_shot.mdx
 FS_ARGS = dict(batch_size=16, num_epochs=1, num_iterations=20)  # the benchmark's run_colab.py CONFIG
+MOSHE_ARGS = dict(batch_size=16, max_steps=30)  # shared recipe; max_length left at the model's default
 MODELS = ["sentence-transformers/paraphrase-mpnet-base-v2", "sentence-transformers/all-mpnet-base-v2",
           "BAAI/bge-small-en-v1.5", "BAAI/bge-base-en-v1.5", "BAAI/bge-large-en-v1.5"]
 # method -> (zero-shot label words (negative, positive) or None, gold examples per class, sample_size per label)
@@ -39,8 +45,14 @@ METHODS = {
     "fs8": (None, 8, 0),
     "fs32": (None, 32, 0),
     "fs8+zs": (("not toxic", "toxic"), 8, 8),
+    "zs_neutral": (("neutral", "toxic"), 0, 8),  # shared recipe's candidate_labels
 }
-STAGES = {1: dict(models=MODELS, methods=list(METHODS), seeds=[0])}
+# cap_seconds: kill `colab run` after this long (it once hung before executing anything)
+STAGES = {
+    "1": dict(models=MODELS, methods=[m for m in METHODS if m != "zs_neutral"], seeds=[0], cap_seconds=3600),
+    "moshe": dict(models=["BAAI/bge-base-en", "BAAI/bge-base-en-v1.5"], methods=["zs_neutral"], seeds=[0, 1, 2],
+                  args=MOSHE_ARGS, max_length=None, train_all=True, cap_seconds=1800),
+}
 
 
 def splits():
@@ -73,7 +85,8 @@ def build_runs(stage: dict, train_pool) -> list[dict]:
                 gold = gold_examples(train_pool, seed, k) if k else []
                 train = [dict(text=x["text"], label=x["label"]) for x in gold] + (templated(words, n_zs) if words else [])
                 runs.append(dict(id=f"{model.split('/')[-1]}|{method}|s{seed}", model=model, method=method, seed=seed,
-                                 max_length=384, args=FS_ARGS if k else ZS_ARGS, train=train,
+                                 max_length=stage.get("max_length", 384),
+                                 args=stage.get("args") or (FS_ARGS if k else ZS_ARGS), train=train,
                                  train_ids=[x["id"] for x in gold]))
     return runs
 
@@ -113,6 +126,12 @@ def best_threshold(y: list[bool], p: list[float]) -> float:
     return best
 
 
+def train_all() -> tuple[list[str], list[bool]]:
+    """All rows of the ToxicChat 0124 train CSV (human-annotated or not): texts and toxicity labels."""
+    rows = list(csv.DictReader(open(POOLS / "lmsys__toxic-chat_annotation_train.csv", encoding="utf-8")))
+    return [r["user_input"] for r in rows], [r["toxicity"] == "1" for r in rows]
+
+
 def score(runs: list[dict], out: dict, val, test) -> dict:
     y_val, y_test = [bool(it.gold) for it in val], [bool(it.gold) for it in test]
     res = {}
@@ -132,6 +151,8 @@ def score(runs: list[dict], out: dict, val, test) -> dict:
                     test=metrics(y_test, pt, 0.5) | dict(auroc=auroc(y_test, pt), f1_ci=list(c.f1.ci),
                                                          tuned_f1=metrics(y_test, pt, t)["f1"]))
         assert abs(row["test"]["f1"] - c.f1.value) < 1e-9
+        if "train_all" in o["p_pos"]:
+            row["train_all"] = metrics(train_all()[1], o["p_pos"]["train_all"], 0.5)
         res[r["id"]] = row
     return res
 
@@ -142,20 +163,22 @@ def show(res: dict) -> None:
     for v in ok:
         a, b = v["val"], v["test"]
         rid = f"{v['model'].split('/')[-1]}|{v['method']}|s{v['seed']}"
+        extra = f" | train_all acc {100*v['train_all']['acc']:5.1f} F1 {100*v['train_all']['f1']:5.1f}" if "train_all" in v else ""
         print(f"{rid:40s} | {100*a['f1']:5.1f} {100*a['tuned_f1']:5.1f} {100*a['macro_f1']:5.1f} {100*a['auroc']:5.1f} | "
-              f"{100*b['f1']:5.1f} {100*b['tuned_f1']:5.1f} {100*b['macro_f1']:5.1f} {100*b['acc']:5.1f} {100*b['auroc']:5.1f}")
+              f"{100*b['f1']:5.1f} {100*b['tuned_f1']:5.1f} {100*b['macro_f1']:5.1f} {100*b['acc']:5.1f} {100*b['auroc']:5.1f}{extra}")
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--stage", type=int, default=1, choices=sorted(STAGES))
+    ap.add_argument("--stage", default="1", choices=sorted(STAGES))
     ap.add_argument("--gpus", default="L4")
     ap.add_argument("--dry", action="store_true", help="build the job and print its sizes; no Colab")
     ap.add_argument("--rescore", action="store_true", help="re-score work/search_tc_stage<n>_out.json without Colab")
     a = ap.parse_args()
     train_pool, val, test = splits()
     assert not {it.id for it in val} & {it.id for it in train_pool}
-    runs = build_runs(STAGES[a.stage], train_pool)
+    stage = STAGES[a.stage]
+    runs = build_runs(stage, train_pool)
     print(f"train pool {len(train_pool)} (pos {sum(it.gold for it in train_pool)}), val {len(val)} "
           f"(pos {sum(it.gold for it in val)}), test {len(test)} (pos {sum(it.gold for it in test)}), runs {len(runs)}")
     if a.dry:
@@ -164,10 +187,13 @@ def main():
         return
     raw = WORK / f"search_tc_stage{a.stage}_out.json"
     if not a.rescore:
-        job = dict(texts=dict(val=[input_text(TASK, it) for it in val], test=[input_text(TASK, it) for it in test]),
+        texts = dict(val=[input_text(TASK, it) for it in val], test=[input_text(TASK, it) for it in test])
+        if stage.get("train_all"):
+            texts["train_all"] = train_all()[0]
+        job = dict(texts=texts,
                    runs=[{k: r[k] for k in ("id", "model", "seed", "max_length", "args", "train")} for r in runs])
         raw.write_text(json.dumps(run_on_colab(job, 0, a.gpus.split(","), f"search_tc_stage{a.stage}_",
-                                               template="colab_search_job.py")))
+                                               template="colab_search_job.py", cap_seconds=stage["cap_seconds"])))
     out = json.loads(raw.read_text())
     print(json.dumps(out["env"]))
     res = score(runs, out, val, test)
