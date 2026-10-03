@@ -30,7 +30,7 @@ from jsb.metrics.stats import confusion  # noqa: E402  (tasks.py puts upstream o
 from jsb.workflow.decide import BOOLEAN_TRUE_THRESHOLD  # noqa: E402  (0.5, upstream's threshold)
 
 CONFIG = dict(model="sentence-transformers/all-mpnet-base-v2", per_class=8, batch_size=16, max_length=384,
-              num_iterations=20, n_latency=100, labels="opus")
+              num_iterations=20, n_latency=100, labels="opus", precision="auto")
 SETFIT_REF = "a000da034c7d15328a119424dfcb769231d945d2"  # danielkorat/setfit main when this benchmark was added; no library changes since
 WORK = HERE / "work"
 RESULTS = HERE / "results"
@@ -52,7 +52,7 @@ def out_dir(cfg: dict) -> tuple[Path, str]:
     """(results dir, work-file prefix) for a config: the Opus run keeps its original paths."""
     if cfg["labels"] == "opus":
         return RESULTS, ""
-    tag = f"{cfg['model'].split('/')[-1]}_k{cfg['per_class']}"
+    tag = f"{cfg['model'].split('/')[-1]}_k{cfg['per_class']}" + ("_fp32" if cfg["precision"] == "fp32" else "")
     return RESULTS / "gold" / tag, f"gold_{tag}_"
 
 
@@ -131,12 +131,14 @@ def main():
     ap.add_argument("--labels", choices=["opus", "gold"], default="opus")
     ap.add_argument("--model", default=CONFIG["model"])
     ap.add_argument("--shots", type=int, default=CONFIG["per_class"], help="training examples per class")
+    ap.add_argument("--precision", choices=["auto", "fp32"], default="auto",
+                    help="auto: bf16 training where supported (fp16 otherwise); fp32: no mixed precision (bf16 hurt mpnet, see README)")
     ap.add_argument("--rescore", action="store_true", help="re-score work/<prefix>colab_out_seed<s>.json without Colab")
     ap.add_argument("--dry", action="store_true", help="build the job and print its sizes; no Colab")
     a = ap.parse_args()
     if a.labels == "opus" and a.shots != CONFIG["per_class"]:
         ap.error(f"--labels opus has {CONFIG['per_class']} Opus-labeled examples per class; other --shots need --labels gold")
-    cfg = CONFIG | dict(model=a.model, per_class=a.shots, labels=a.labels)
+    cfg = CONFIG | dict(model=a.model, per_class=a.shots, labels=a.labels, precision=a.precision)
     results, prefix = out_dir(cfg)
     job, meta = build_job(a.seed, cfg)
     if a.dry:

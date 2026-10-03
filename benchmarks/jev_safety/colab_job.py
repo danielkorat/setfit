@@ -2,7 +2,7 @@
 
 Installs SetFit, then per task: trains on the 8+8 Opus-labeled examples, predicts P(positive) for every test case,
 and times batch-1 GPU inference. Prints the result as gzip+base64 JSON between RESULT markers on stdout.
-Training runs under bf16 autocast (fp16 AMP on GPUs without bf16); inference runs in fp32.
+Training runs under bf16 autocast (fp16 AMP on GPUs without bf16) unless config precision is fp32; inference runs in fp32.
 """
 
 import base64
@@ -45,6 +45,8 @@ def main():
     cfg = job["config"]
     device = "cuda" if torch.cuda.is_available() else "cpu"
     precision = ("bf16" if torch.cuda.is_bf16_supported() else "fp16") if device == "cuda" else "fp32"
+    if cfg.get("precision") == "fp32":  # bf16 autocast hurt mpnet as training got longer (README -> mpnet drop)
+        precision = "fp32"
     sync = torch.cuda.synchronize if device == "cuda" else (lambda: None)
     import setfit
     env = dict(gpu=torch.cuda.get_device_name(0) if device == "cuda" else "cpu", precision=precision, torch=torch.__version__,

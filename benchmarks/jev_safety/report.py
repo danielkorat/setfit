@@ -62,31 +62,33 @@ def gold_section() -> list[str]:
         seeds = load_seeds(d)
         if seeds:
             cfg = seeds[0]["config"]
-            runs.append((cfg["model"], cfg["per_class"], seeds, summarize(seeds)))
+            runs.append((cfg["model"], cfg["per_class"], seeds[0]["env"]["precision"], seeds, summarize(seeds)))
     if not runs:
         return []
-    runs.sort(key=lambda r: (r[0], r[1]))
-    seed0 = {(m, k): 100 * statistics.mean(next(r for r in seeds if r["seed"] == 0)["tasks"][tid]["f1"] for tid, *_ in ROWS)
-             for m, k, seeds, _ in runs if any(r["seed"] == 0 for r in seeds)}
+    runs.sort(key=lambda r: (r[2], r[0], r[1]))
+    seed0 = {(m, k, pr): 100 * statistics.mean(next(r for r in seeds if r["seed"] == 0)["tasks"][tid]["f1"] for tid, *_ in ROWS)
+             for m, k, pr, seeds, _ in runs if any(r["seed"] == 0 for r in seeds)}
     best = max(seed0, key=seed0.get)
-    hdr = ["Model", "per class", "seeds"] + [label for _, _, label, *_ in ROWS] + ["Average"]
+    hdr = ["Model", "per class", "training", "seeds"] + [label for _, _, label, *_ in ROWS] + ["Average"]
     lines = ["## Gold-label pilot (human labels; not the 0-label column)", "",
              "Same pools, test sets, hyperparameters and scoring as above, but the training examples are picked by their "
              "gold label instead of Opus's (pool shuffled with Random(seed), first k of each class, so the 8 are a subset of "
              "the 32, and the 32 of the 64). Purpose: check whether SetFit reaches the published range at all with clean labels. "
              "F1 (%), mean ± sample std over the listed seeds.", "",
              "| " + " | ".join(hdr) + " |", "|" + "---|" * len(hdr)]
-    for m, k, seeds, s in runs:
+    for m, k, pr, seeds, s in runs:
         cell = (lambda v: f"{v['mean']:.1f} ± {v['std']:.1f}") if len(seeds) > 1 else (lambda v: f"{v['mean']:.1f}")
         avg = cell(s["avg"])
-        lines.append(f"| `{m.split('/')[-1]}` | {k} | {', '.join(str(r['seed']) for r in seeds)} | "
-                     + " | ".join(cell(s[tid]) for tid, *_ in ROWS) + f" | {'**' + avg + '**' if (m, k) == best else avg} |")
-    hb = sorted({n for _, _, _, s in runs for n in s["hb_harmful_response"]["n"]}, reverse=True)
+        lines.append(f"| `{m.split('/')[-1]}` | {k} | {pr} | {', '.join(str(r['seed']) for r in seeds)} | "
+                     + " | ".join(cell(s[tid]) for tid, *_ in ROWS) + f" | {'**' + avg + '**' if (m, k, pr) == best else avg} |")
+    hb = sorted({n for *_, s in runs for n in s["hb_harmful_response"]["n"]}, reverse=True)
     verdict = "passes" if seed0[best] >= GO_F1 else "fails"
     lines += ["", f"HarmBench response excludes each run's training items from scoring (2 x per class), so its n is "
               f"{', '.join(map(str, hb))} across rows.", "",
               f"Go/no-go (written before the pilot ran): continue only if some setting reaches seed-0 average F1 >= {GO_F1:.0f}. "
-              f"Best seed-0 setting: `{best[0].split('/')[-1]}` with {best[1]} per class, {seed0[best]:.1f}, so the pilot {verdict}.", ""]
+              f"Best seed-0 setting: `{best[0].split('/')[-1]}` with {best[1]} per class ({best[2]} training), {seed0[best]:.1f}, "
+              f"so the pilot {verdict}. bf16 rows are the first pilot; fp32 rows rerun it after bf16 was found to hurt mpnet "
+              f"as training gets longer (README.md -> Status).", ""]
     return lines
 
 
@@ -188,6 +190,7 @@ def write_markdown(pub: dict, s: dict, seeds: list[dict]) -> str:
               "(mostly chemical/biological HarmBench generations); such items are never used for training but stay in scoring.",
               "",
               *gold_section(),
+              *auprc_section(),
               "## Caveats",
               "",
               "- These public datasets (WildGuardMix, Aegis 2.0, ToxicChat, HarmBench) predate the training cutoffs of both Opus and Jev, "
@@ -200,6 +203,132 @@ def write_markdown(pub: dict, s: dict, seeds: list[dict]) -> str:
     md = "\n".join(lines)
     (HERE / "RESULTS.md").write_text(md)
     return table
+
+
+# ---------------------------------------------------------------- AUPRC (threshold-free)
+DATA = HERE / "upstream" / "data"
+BENCH = {tid: key.split("/")[0] for tid, key, *_ in ROWS}
+
+
+def auprc(y: list[bool], p: list[float]) -> float:
+    """Average precision (sklearn's step-wise AUPRC): sum over distinct scores, high to low, of recall gain x precision."""
+    pairs = sorted(zip(p, y), key=lambda t: -t[0])
+    n_pos, tp, seen, prev_r, ap, i = sum(y), 0, 0, 0.0, 0.0, 0
+    while i < len(pairs):
+        j = i
+        while j < len(pairs) and pairs[j][0] == pairs[i][0]:  # a tie group is one threshold
+            tp += pairs[j][1]
+            j += 1
+        seen += j - i
+        r = tp / n_pos
+        ap += (r - prev_r) * tp / seen
+        prev_r, i = r, j
+    return ap
+
+
+def banded(p: list[float]) -> list[int]:
+    """Upstream's 0.1 reliability bands ([0.0, 0.1) ... [0.9, 1.0]) as tied scores 0..9."""
+    return [sum(x >= k / 10 for k in range(1, 10)) for x in p]
+
+
+def gold_by_case() -> dict[str, dict[str, bool]]:
+    """task id -> case id -> gold label, from upstream's local case files (the same rows tasks.load_test reads)."""
+    out = {tid: {} for tid in BENCH}
+    for bench in set(BENCH.values()):
+        for line in open(DATA / f"{bench}_cases.jsonl"):
+            row = json.loads(line)
+            for tid in row["tasks"]:
+                if tid in out and row["gold"].get(tid) is not None:
+                    out[tid][row["case_id"]] = bool(row["gold"][tid])
+    return out
+
+
+def setfit_auprc(pred_file: Path, gold: dict) -> dict[str, tuple[float, float]]:
+    """task id -> (AUPRC on exact scores, AUPRC on the same scores put in upstream's 10 bands)."""
+    preds = json.loads(pred_file.read_text())
+    out = {}
+    for tid, by_case in preds.items():
+        y = [gold[tid][c] for c in by_case]
+        p = list(by_case.values())
+        out[tid] = (auprc(y, p), auprc(y, banded(p)))
+    return out
+
+
+def jev_auprc() -> dict[str, tuple[float, float]]:
+    """task id -> (min, max) AUPRC of Jev from upstream's 10-band reliability tables, items in a band tied.
+
+    A band's positive count is n x rate, but rates are rounded to 3 decimals, so a large band can fit 2+ counts; only
+    combinations that reproduce the report's total positives (tp + fn) and its tp at 0.5 are kept.
+    """
+    import itertools
+
+    text = REPORT.read_text()
+    out = {}
+    for tid, key, *_ in ROWS:
+        head = re.search(rf"#### {tid}\n\n- n=(\d+) \(tp=(\d+) fp=\d+ tn=\d+ fn=(\d+)\)", text)
+        n_all, tp, fn = map(int, head.groups())
+        sec = text.split(f"### {key}\n", 1)[1].split("\n### ", 1)[0]
+        bands = [(int(float(lo) * 10), int(n), float(rate)) for lo, n, rate in
+                 re.findall(r"\| \[(\d\.\d), \d\.\d[)\]] \| (\d+) \| [\d.]+ \| ([\d.]+) \|", sec)]
+        assert sum(n for _, n, _ in bands) == n_all, (tid, bands)
+        cands = [[k for k in range(n + 1) if abs(k / n - rate) <= 0.0005 + 1e-12] for _, n, rate in bands]
+        vals = []
+        for ks in itertools.product(*cands):
+            if sum(ks) != tp + fn or sum(k for (b, _, _), k in zip(bands, ks) if b >= 5) != tp:
+                continue
+            y, p = [], []
+            for (b, n, _), k in zip(bands, ks):
+                y += [True] * k + [False] * (n - k)
+                p += [b] * n
+            vals.append(auprc(y, p))
+        assert vals, f"{tid}: no band counts reproduce tp={tp}, fn={fn}"
+        out[tid] = (min(vals), max(vals))
+    return out
+
+
+def auprc_section() -> list[str]:
+    """RESULTS.md lines: AUPRC of Jev (from its reliability tables) and of every SetFit run with stored predictions."""
+    gold = gold_by_case()
+    jev = jev_auprc()
+    pos_rate = {tid: statistics.mean(gold[tid].values()) for tid in BENCH}
+    zero = [setfit_auprc(f, gold) for f in sorted((RESULTS / "predictions").glob("seed*.json"))]
+    fmt = lambda lo, hi: f"{100 * lo:.1f}" if hi - lo < 0.0005 else f"{100 * lo:.1f}-{100 * hi:.1f}"
+    lines = ["## AUPRC (threshold-free)", "",
+             "Area under the precision-recall curve, as average precision (sklearn's definition), on the positive class. "
+             "A random ranking scores the positive rate. Upstream does not publish Jev's per-case probabilities, only a "
+             "reliability table per task (count and positive rate in each 0.1 probability band), so Jev's AUPRC treats all "
+             "items in a band as tied; SetFit is shown both on its exact scores and put in the same 10 bands, which is the "
+             "like-for-like comparison. A range means more than one set of band counts fits the report's rounded rates.", "",
+             f"| Task | positive rate | Jev (10 bands) | SetFit 0 labels, 10 bands | SetFit 0 labels, exact |", "|---|---|---|---|---|"]
+    for tid, _, label, *_ in ROWS:
+        ex = [z[tid][0] for z in zero]
+        bd = [z[tid][1] for z in zero]
+        sd = lambda xs: f" ± {100 * statistics.stdev(xs):.1f}" if len(xs) > 1 else ""
+        lines.append(f"| {label} | {100 * pos_rate[tid]:.1f} | {fmt(*jev[tid])} | {100 * statistics.mean(bd):.1f}{sd(bd)} | "
+                     f"{100 * statistics.mean(ex):.1f}{sd(ex)} |")
+    avg = lambda xs: 100 * statistics.mean(xs)
+    lines.append(f"| **Average of all five tasks** | {avg(pos_rate.values()):.1f} | "
+                 f"**{fmt(avg([jev[t][0] for t in BENCH]) / 100, avg([jev[t][1] for t in BENCH]) / 100)}** | "
+                 f"**{statistics.mean(avg([z[t][1] for t in BENCH]) for z in zero):.1f}** | "
+                 f"**{statistics.mean(avg([z[t][0] for t in BENCH]) for z in zero):.1f}** |")
+    lines += ["", f"SetFit 0 labels: mean over {len(zero)} seed{'s' if len(zero) != 1 else ''}. Positive rate is over upstream's "
+              "full test set; SetFit's HarmBench response scores exclude each seed's training items.", ""]
+    runs = []
+    for d in sorted((RESULTS / "gold").glob("*_k*")):
+        for f in sorted((d / "predictions").glob("seed0.json")):
+            cfg = json.loads((d / "seed0.json").read_text())
+            runs.append((cfg["config"]["model"].split("/")[-1], cfg["config"]["per_class"], cfg["env"]["precision"],
+                         setfit_auprc(f, gold)))
+    if runs:
+        runs.sort(key=lambda r: (r[2], r[0], r[1]))
+        lines += ["Gold-label runs (seed 0, exact scores):", "",
+                  "| Model | per class | training | " + " | ".join(label for _, _, label, *_ in ROWS) + " | Average |",
+                  "|" + "---|" * (4 + len(ROWS))]
+        for m, k, pr, a in runs:
+            lines.append(f"| `{m}` | {k} | {pr} | " + " | ".join(f"{100 * a[tid][0]:.1f}" for tid in BENCH)
+                         + f" | {avg([a[tid][0] for tid in BENCH]):.1f} |")
+        lines.append("")
+    return lines
 
 
 # ---------------------------------------------------------------- chart (recreates the LinkedIn post's layout)
