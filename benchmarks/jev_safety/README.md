@@ -42,6 +42,17 @@ Results: [RESULTS.md](RESULTS.md) (table, setup, seeds, Opus-vs-gold agreement, 
   and 31.8-32.2. His snippet scores `metric="accuracy"`, so 80.6 is most likely accuracy, not the chart's F1.
   Differences from his run: bf16 autocast here, setfit at `a000da0`, and his evaluation split is not in the snippet.
   Per-run numbers: `results/search/tc_stagemoshe.json`.
+- **mpnet drop diagnosis (3 Oct 2026, written before it ran):** `all-mpnet-base-v2` got worse with more gold
+  examples (ToxicChat 45.6 -> 31.7, WildGuardTest 63.9 -> 60.3 F1 at 8 -> 32 per class). `diag_mpnet.py` reruns
+  32 per class on those two tasks with one change each: fp32, 5 pair iterations (same 640 pairs as 8 per class), or
+  a frozen body; bge-base is the control. Rule: if fp32 or 5 iterations brings 32 per class back to at least its
+  8-per-class F1 on both tasks, it is a training problem and the gold pilot is rerun with the fix; if neither does,
+  stop debugging. The unchanged reruns must match the pilot within 1 F1, or nondeterminism is reported first.
+  **Result: bf16 is the problem.** Unchanged reruns match the pilot exactly. At 32 per class, fp32 gives ToxicChat
+  58.8 / WildGuardTest 66.7 (bf16: 31.7 / 60.3; 8 per class: 45.6 / 63.9), and 5 iterations under bf16 gives
+  55.3 / 68.2, so bf16 autocast hurts mpnet as training gets longer. A frozen body (head only) gives 59.4 / 69.6,
+  as good as full training. bge-base fp32 vs bf16 is mixed (59.0 -> 60.9, 66.8 -> 59.0). Per-run numbers:
+  `results/diag/mpnet_drop.json`. Next, per the rule: the gold pilot rerun in fp32.
 - **Colab runs need the Mac awake:** a lid-closed sleep on battery drops `colab run`'s connection and the local
   process then waits forever (3 Oct 2026, two runs lost). Keep the lid open or the Mac on power.
 

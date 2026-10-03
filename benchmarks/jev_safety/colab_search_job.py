@@ -1,7 +1,8 @@
 """Runs on a fresh Colab GPU VM via `colab run` (see search_tc.py, which embeds the inputs as PAYLOAD below).
 
 One VM, many runs: per run, trains a SetFit model on that run's examples with that run's TrainingArguments and returns
-P(positive) for every text of every shared split. Prints gzip+base64 JSON between RESULT markers on stdout.
+P(positive) for every text of the run's `splits` (default: every shared split). Optional per run: `precision: "fp32"`
+turns off mixed precision; `frozen: true` skips body training and fits only the logistic-regression head. Prints gzip+base64 JSON between RESULT markers on stdout.
 Training runs under bf16 autocast (fp16 AMP on GPUs without bf16); inference runs in fp32.
 """
 
@@ -43,18 +44,23 @@ def main():
             model = SetFitModel.from_pretrained(run["model"], device=device)
             if run["max_length"]:  # None = keep the model's own max_seq_length
                 model.model_body.max_seq_length = run["max_length"]
+            prec = run.get("precision", precision)
             args = TrainingArguments(**run["args"], max_length=run["max_length"], seed=run["seed"], report_to="none",
                                      show_progress_bar=False, logging_steps=10_000, save_strategy="no",
-                                     use_amp=precision == "fp16")
+                                     use_amp=prec == "fp16")
             trainer = Trainer(model=model, args=args, train_dataset=train)
             sync()
             t0 = time.perf_counter()
-            with torch.autocast(device, dtype=torch.bfloat16, enabled=precision == "bf16"):
-                trainer.train()
+            if run.get("frozen"):  # head only, on the pretrained body's embeddings
+                model.model_head.fit(model.encode(train["text"], show_progress_bar=False), train["label"])
+            else:
+                with torch.autocast(device, dtype=torch.bfloat16, enabled=prec == "bf16"):
+                    trainer.train()
             sync()
             res = dict(train_seconds=time.perf_counter() - t0, p_pos={})
             classes = [int(c) for c in model.model_head.classes_]
-            for split, texts in job["texts"].items():
+            for split in run.get("splits", list(job["texts"])):
+                texts = job["texts"][split]
                 proba = np.asarray(model.predict_proba(texts, batch_size=64, show_progress_bar=False))
                 if not np.isfinite(proba).all():
                     raise RuntimeError(f"{split}: non-finite probabilities")
