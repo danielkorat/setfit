@@ -39,7 +39,10 @@ def scores(y, p, rate):
 
 def main():
     t_start = time.perf_counter()
-    subprocess.run([sys.executable, "-m", "pip", "install", "-q", "-U", "sentence-transformers", "einops"], check=True)
+    job = json.loads(gzip.decompress(base64.b64decode(PAYLOAD)))
+    # remote-code models (gte-large-en-v1.5, jina-embeddings-v3) break on transformers 5; such jobs pin older versions
+    subprocess.run([sys.executable, "-m", "pip", "install", "-q", *job.get("pip", ["-U", "sentence-transformers", "einops"])],
+                   check=True)
     import numpy as np
     import sentence_transformers
     import torch
@@ -47,8 +50,9 @@ def main():
     from sklearn.linear_model import LogisticRegression
     from sklearn.model_selection import StratifiedKFold, cross_val_predict
 
-    job = json.loads(gzip.decompress(base64.b64decode(PAYLOAD)))
-    env = dict(gpu=torch.cuda.get_device_name(0), torch=torch.__version__, sentence_transformers=sentence_transformers.__version__,
+    import transformers
+
+    env = dict(transformers=transformers.__version__, gpu=torch.cuda.get_device_name(0), torch=torch.__version__, sentence_transformers=sentence_transformers.__version__,
                python=sys.version.split()[0], install_seconds=time.perf_counter() - t_start)
     print(json.dumps(env), file=sys.stderr, flush=True)
     out = dict(env=env, models={})
@@ -92,7 +96,7 @@ def main():
                         r.update(f1_oof=f1_at(np.asarray(y, bool), np.asarray(p), t_oof), t_oof=float(t_oof), n=len(y))
                         res["runs"][f"{tid}|k{k}|s{seed}"] = r
                         if m["name"] == job["check"]["model"] and k == job["check"]["k"] and str(seed) == str(job["check"]["seed"]):
-                            res.setdefault("check_p_pos", {})[tid] = {c: round(float(x), 6) for (c, _), x in zip(test, p)}
+                            res.setdefault("check_p_pos", {})[tid] = {c: float(x) for (c, _), x in zip(test, p)}  # unrounded
                 print(json.dumps({"model": m["name"], "task": tid, "embed_s": round(res["embed_seconds"][tid], 1)}), file=sys.stderr, flush=True)
             del model
             torch.cuda.empty_cache()

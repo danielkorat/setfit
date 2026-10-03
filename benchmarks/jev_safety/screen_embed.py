@@ -39,11 +39,12 @@ MODELS = [
     dict(name="bge-large-en-v1.5", id="BAAI/bge-large-en-v1.5"),
     dict(name="gte-modernbert-base", id="Alibaba-NLP/gte-modernbert-base"),
     dict(name="gte-large-en-v1.5", id="Alibaba-NLP/gte-large-en-v1.5", trust_remote_code=True),
-    dict(name="nomic-embed-text-v1.5", id="nomic-ai/nomic-embed-text-v1.5", trust_remote_code=True, prefix="classification: "),
     dict(name="Qwen3-Embedding-0.6B", id="Qwen/Qwen3-Embedding-0.6B", instruction=True),
     dict(name="embeddinggemma-300m", id="google/embeddinggemma-300m", prefix="task: classification | query: "),  # gated
     # non-commercial license (CC BY-NC): a reference point only, never the business setting
     dict(name="jina-embeddings-v3", id="jinaai/jina-embeddings-v3", trust_remote_code=True, encode_kwargs=dict(task="classification")),
+    # last: a CUDA device-side error here (seen with transformers 5) poisons the GPU for every later model
+    dict(name="nomic-embed-text-v1.5", id="nomic-ai/nomic-embed-text-v1.5", trust_remote_code=True, prefix="classification: "),
 ]
 HF_TOKEN_FILE = WORK / "hf_token"  # gitignored; the operator pastes a read token here for the gated Gemma model
 CHECK = dict(model="all-mpnet-base-v2", k=32, seed=0)  # P(positive) returned for this run, re-scored with jsb locally
@@ -88,12 +89,16 @@ def main():
     ap.add_argument("--rescore", action="store_true")
     ap.add_argument("--models", help="comma-separated model names to run (default: all)")
     ap.add_argument("--tag", default="step1", help="output name: results/screen/embed_<tag>.json")
+    ap.add_argument("--pip", help="pip install arguments on the VM, e.g. 'sentence-transformers<6 transformers<5 einops'")
     a = ap.parse_args()
     models = [m for m in MODELS if not a.models or m["name"] in a.models.split(",")]
     job, tests = build(models)
+    if a.pip:
+        job["pip"] = a.pip.split()
     n_texts = sum(len(t["texts"]) for t in job["tasks"].values())
     print(f"{len(models)} models, {n_texts} texts to embed per model, {len(SEEDS)} seeds x {PER_CLASS} per class")
     if a.dry:
+        print("pip:", job.get("pip", "default (latest sentence-transformers)"))
         for tid, t in job["tasks"].items():
             print(tid, len(t["texts"]), "texts, test", len(t["test_ids"]), f"rate {t['rate']:.3f}",
                   "seed0 pos/neg", len(t["train"]["0"]["pos"]), len(t["train"]["0"]["neg"]))
@@ -115,7 +120,9 @@ def main():
         gold = {it.id: bool(it.gold) for it in tests[tid]}
         c = confusion([(gold[cid], p >= 0.5) for cid, p in by_case.items()])
         vm = out["models"][CHECK["model"]]["runs"][f"{tid}|k{CHECK['k']}|s{CHECK['seed']}"]["f1"]
-        assert abs(c.f1.value - vm) < 1e-9, (tid, c.f1.value, vm)
+        # older runs rounded the check probabilities to 6 decimals, which can move a score onto 0.5
+        boundary = sum(abs(p - 0.5) < 1e-6 for p in by_case.values())
+        assert abs(c.f1.value - vm) < 1e-9 or (boundary and abs(c.f1.value - vm) < 0.002 * boundary), (tid, c.f1.value, vm)
     print("check: VM F1 == jsb F1 on the check run" if chk else "check: skipped (check model not in this run)")
     summ = summarize(out)
     (HERE / "results" / "screen").mkdir(parents=True, exist_ok=True)
